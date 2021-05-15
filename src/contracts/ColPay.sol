@@ -12,12 +12,14 @@ contract ColPay {
 
     mapping(uint => PaymentContract) public paymentContracts;
     mapping(uint => Transaction[]) public transactionLists;
+    mapping(address => uint) public totalDebt;
     mapping(address => uint[]) public paymentContractsHeldPerAddress;
 
     uint constant NOT_REVIEWED_STATUS = 1;
     uint constant REJECTED_STATUS = 2;
     uint constant ACCEPTED_STATUS = 3;
     uint constant EXPIRED_STATUS = 4;
+    uint constant FULFILLED_STATUS = 5;
 
     struct Transaction {
         uint256 date;
@@ -60,6 +62,12 @@ contract ColPay {
         uint contractStatus
     );
 
+    event TransactionMade (
+        uint256 date,
+        uint contractID,
+        uint value
+    );
+
     constructor(CPToken.CPToken _cpToken) {
         name = "Payment Fragmentation Service";
         cpToken = _cpToken;
@@ -99,6 +107,13 @@ contract ColPay {
             seller = _recipient;
             buyer = msg.sender;
         }
+
+        // Check that the buyer will have enough cpTokens to pay this contract and all others.
+        require(totalDebt[buyer] + _totalAmount <= cpToken.balanceOf(buyer), "The buyer must have enough cpTokens to pay this contract and others");
+
+        // Update the buyers total debt
+        totalDebt[buyer] = totalDebt[buyer] + _totalAmount;
+
         paymentContracts[contractCount] = PaymentContract(contractCount, _name, _totalAmount, 0, buyer, seller, _startDate, _expiryDate, _daysToOpen, _speed, NOT_REVIEWED_STATUS, _createdBySeller);
 
         // Trigger Event
@@ -157,7 +172,7 @@ contract ColPay {
         // Check for valid requests
         PaymentContract memory _contract = paymentContracts[_contractID];
 
-        require(_newStatusID == NOT_REVIEWED_STATUS || _newStatusID == REJECTED_STATUS || _newStatusID == ACCEPTED_STATUS || _newStatusID == EXPIRED_STATUS, "The new status must be valid (1, 2, 3)");
+        require(_newStatusID == NOT_REVIEWED_STATUS || _newStatusID == REJECTED_STATUS || _newStatusID == ACCEPTED_STATUS || _newStatusID == EXPIRED_STATUS, "The new status must be valid");
 
         // Change contract agreement status
         _contract.contractStatus = _newStatusID;
@@ -182,10 +197,47 @@ contract ColPay {
         }
     }
 
-    // Request a Payment
-
     // Make a Transaction
-    function makeTransaction (uint _contractID, uint _value) public {
+    // will move value from buyer to seller & update the remaining amount to contract 
+    // this function should use from statement in metadata when called 
+    function makeTransaction (uint _contractID, uint _value) public { 
+        // Check for valid requests
+        require(_contractID > 0 && _contractID <= contractCount, "The contract ID must be valid");
+        require(_value > 0, "Amount to Pay must be more than 0 CPTokens");
+
+        PaymentContract memory _contract = paymentContracts[_contractID];
+        uint totalPayment = _contract.amountPaid + _value;
+        require(totalPayment <= _contract.totalAmount, "Total amount paid must not be more than the total value of PaymentContract");
+        require(_contract.contractStatus == ACCEPTED_STATUS, "The new status must allow for payment");
+        require(cpToken.balanceOf(msg.sender) >= _value, "The buyer must have enough CPTokens to complete the transaction." );
+        require(_contract.buyer == msg.sender || owner == msg.sender, "Only Buyer or ColPay can make transactions in a contract");
+        require(block.timestamp > DateTimeLibrary.DateTimeLibrary.addDays(_contract.startDate, _contract.daysToOpen), "Enough days have to have past in order for the contract to allow for transactions");
+
+        uint totalContractTime = DateTimeLibrary.DateTimeLibrary.diffSeconds(_contract.startDate, _contract.expiryDate);
+        uint elapsedContractTime = DateTimeLibrary.DateTimeLibrary.diffSeconds(_contract.startDate, block.timestamp);
+        uint percentageOfElapsedTime = (elapsedContractTime * 100) / totalContractTime;
+        uint percentagePayable = (percentageOfElapsedTime * _contract.speed)/ 100;
+        uint maxTotalCurrentTotalPayment = (percentagePayable * _contract.totalAmount) / 100;
+
+        require(maxTotalCurrentTotalPayment <= _contract.amountPaid + _value, "The Contract cannot exceed the maximum amount allowed by the speed.");
+
+        // Add transaction to List of all transactions for that contract
+        transactionLists[_contractID].push(Transaction(block.timestamp, _value));
+
+        // Make transaction of cpTokens
+        cpToken.transfer(_contract.seller, _value);
+
+        // Update the amount of the contract paid
+        _contract.amountPaid = totalPayment;
+
+        // Update contract status if necessary
+        if(totalPayment == _contract.totalAmount){
+            updatePaymentContractStatus(_contractID, FULFILLED_STATUS);
+        }
+
+        paymentContracts[_contractID] = _contract;
+
+        emit TransactionMade(block.timestamp, _contractID, _value);
 
     }
 
