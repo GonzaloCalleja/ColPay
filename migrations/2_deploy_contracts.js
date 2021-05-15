@@ -20,8 +20,8 @@ module.exports = async function(deployer, network, accounts) {
   await cpToken.transfer(colPay.address, '1000000000000000000000000')
 
   // Transfer 100 ColPay Tokens to initial buyer account
-  await colPay.issueTokens('100000000000000000000', {from: accounts[1]})
+  await colPay.issueTokens('100000000000000000000', accounts[1])
 
   // Transfer 10 ColPay Tokens to initial seller account
-  await colPay.issueTokens('10000000000000000000', {from: accounts[2]})
+  await colPay.issueTokens('10000000000000000000', accounts[2])
 }
