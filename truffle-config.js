@@ -17,6 +17,7 @@ module.exports = {
     // Test Networks to make smart contract publicly available
     // They work just like the main net, but the Ether is worthless
     // In order for deployment to work first request funds from a faucet!
+    // If nonce too low, try again, the error is from the blocks in the test blockchain
     kovan: {
       provider: () => new HDWalletProvider({
         mnemonic: mnemonic, 
@@ -34,12 +35,12 @@ module.exports = {
     ropsten: {
       provider: () => new HDWalletProvider({
         mnemonic: mnemonic, 
-        providerOrUrl: `https://ropsten.infura.io/v3/${projectId}`, 
+        providerOrUrl: `https://ropsten.infura.io/v3/${projectId}`,
         addressIndex: 0
       }),
       network_id: 3,
-      gasPrice: 20000000000,
-      gas: 5000000,
+      gasPrice: 200000000000,
+      gas: 500000,
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true,

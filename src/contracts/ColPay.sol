@@ -4,24 +4,21 @@ pragma solidity 0.8.4;
 contract ColPay {
     string public name;
 
+    struct Transaction {
+        uint id;
+    }
+
     constructor() {
         name = "Payment Fragmentation Service";
     }
 
-    // TEST CONTRACT
-    uint private value;
+    // Create Transactions
 
-    // Emitted when the stored value changes
-    event ValueChanged(uint newValue);
+    // Request a Payment
 
-    // Stores a new value in the contract
-    function store(uint newValue) public {
-        value = newValue;
-        emit ValueChanged(newValue);
-    }
+    // Make a Payment
 
-    // Reads the last stored value
-    function retrieve() public view returns (uint) {
-        return value;
-    }
+    // Liquidate contract?
+
+    // Purchase a contract?
 }
