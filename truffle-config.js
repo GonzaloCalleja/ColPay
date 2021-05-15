@@ -1,7 +1,7 @@
 require('babel-register');
 require('babel-polyfill');
 
-const { projectId, mnemonic } = require('./secrets.json');
+const { projectId, mnemonic, deployer } = require('./secrets.json');
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 module.exports = {
@@ -9,7 +9,8 @@ module.exports = {
     development: {
       host: "127.0.0.1",
       port: 8545,
-      network_id: "*" // Match any network id
+      network_id: "*", // Match any network id
+      from: deployer
     },
     kovan: {
       provider: () => new HDWalletProvider(mnemonic, `https://kovan.infura.io/v3/${projectId}`),
@@ -18,7 +19,8 @@ module.exports = {
       gasPrice: 20000000000,
       confirmations: 2,
       timeoutBlocks: 200,
-      skipDryRun: true
+      skipDryRun: true,
+      from: deployer
     },
 
     ropsten: {
@@ -30,18 +32,8 @@ module.exports = {
       gas: 5000000,
       confirmations: 2,
       timeoutBlocks: 200,
-      skipDryRun: true
-    },
-    main: {
-      provider: function() {
-        return new HDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/${projectId}`);
-      },
-      network_id: 1,
-      gasPrice: 20000000000,
-      gas: 5000000,
-      confirmations: 2,
-      timeoutBlocks: 200,
-      skipDryRun: true
+      skipDryRun: true,
+      from: deployer
     }
   },
   contracts_directory: './src/contracts/',
