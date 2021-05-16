@@ -25,7 +25,7 @@ module.exports = {
         addressIndex: 0
       }),
       network_id: 42,
-      gas: 5000000,
+      gas: 7992189,
       gasPrice: 20000000000,
       confirmations: 2,
       timeoutBlocks: 200,
@@ -40,7 +40,7 @@ module.exports = {
       }),
       network_id: 3,
       gasPrice: 200000000000,
-      gas: 500000,
+      gas: 7992189,
       confirmations: 2,
       timeoutBlocks: 200,
       skipDryRun: true,
