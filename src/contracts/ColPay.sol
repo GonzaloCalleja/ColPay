@@ -10,11 +10,13 @@ contract ColPay {
     uint public contractCount;
     CPToken.CPToken public cpToken;
 
+    //address[] private participants;
     mapping(uint => PaymentContract) public paymentContracts;
     mapping(uint => Transaction[]) public transactionLists;
+    mapping(address => bool) public isBlocked;
+
     mapping(address => uint) public incurredDebt;
     mapping(address => uint) public potentialDebt;
-    mapping(address => bool) public isBlocked;
     mapping(address => uint[]) public paymentContractsHeldPerAddress;
 
     string[] private CONTRACT_STATUS_TYPES = ['NOT_REVIEWED', 'REJECTED', 'ACCEPTED', 'FULFILLED', 'MISSING_PAYMENT'];
@@ -80,25 +82,57 @@ contract ColPay {
         }
     }
 
-    // Request Tokens - for new accounts
+    // Issuing Tokens
+    // This function allows the prototype to work, it issues new accounts 100 cpTokens to use in contracts.
+    // In actual product, ColPay will require users to prove their ability to pay for contracts with banking information.
     function issueTokens(uint256 _value, address _receipient) public {
         // Check for valid requests
         require(msg.sender == owner, "The caller must be ColPay, they control when new accounts are issued the tokens.");
         require(_value > 0, "Amount Requested Must be more than 0 CPTokens");
         require(_value < cpToken.balanceOf(address(this))/100, "Amount Requested cannot be larger than 1% of current supply");
-        require(cpToken.balanceOf(msg.sender) == 0 && paymentContractsHeldPerAddress[msg.sender].length == 0, "This function only issues CPTokens to new accounts");
+        //require(cpToken.balanceOf(msg.sender) == 0 && paymentContractsHeldPerAddress[msg.sender].length == 0, "This function only issues CPTokens to new accounts");
 
         cpToken.transfer(_receipient, _value);
     }
+/*
+    function addParticipant (address _newParticipant) public {
+        bool exists = false;
+        for (uint i = 0; i < participants.length; i++){
+            if (participants[i] == _newParticipant){
+                exists = true;
+            } 
+        }
+        if (!exists){
+            participants.push(_newParticipant);
+        }
+    }
 
+    function getParticipants () public view returns (address[] memory addresses){
+        return participants;
+    }
+
+    function issueTokens() public {
+        // Only owner can call this function
+        require(msg.sender == owner, "The caller must be ColPay, they control when new accounts are issued the tokens.");
+
+        // Issue tokens to all empty Accounts
+        for (uint i=0; i<participants.length; i++) {
+            address recipient = participants[i];
+            uint balance = cpToken.balanceOf(recipient);
+            if(balance == 0) {
+                cpToken.transfer(recipient, 100000000000000000000);
+            }
+        }
+    }
+*/
     // Create Payment Contract
     function createPaymentContract (string memory _name, uint _totalAmount, address _recipient, uint256 _startDate, uint256 _expiryDate, uint _daysToOpen, uint _speed, bool _createdBySeller) public {
         // Check for valid requests
-        require(_startDate > _expiryDate, "The Payment Contract cannot finish before starting");
+        require(_startDate < _expiryDate, "The Payment Contract cannot finish before starting");
         require(_totalAmount > 0, "Amount to Pay must be more than 0 CPTokens");
         require(bytes(_name).length > 0, "The name of the Payment Contract must be valid");
-        require(DateTimeLibrary.DateTimeLibrary.diffDays(_startDate, _expiryDate) / 2 < _daysToOpen, "The contract must allow transactions before half the time has passed");
-        require(_speed > 0 && _speed < 100, "The payment speed of the contract must be between 0 and 100");
+        require(DateTimeLibrary.DateTimeLibrary.diffDays(_startDate, _expiryDate) / 2 >= _daysToOpen, "The contract must allow transactions before half the time has passed");
+        require(_speed >= 0 && _speed <= 100, "The payment speed of the contract must be between 0 and 100");
         require(block.timestamp < _expiryDate, "The Payment Contract Cannot be already expired");
         require(_recipient != msg.sender, "The buyer cannot be the seller");
 
@@ -132,9 +166,11 @@ contract ColPay {
     // Accept a Payment Contract
     function acceptPaymentContract(uint _contractID) public {
         // Check for valid requests
-        require(_contractID > 0 && _contractID <= contractCount, "The contract ID must be valid");
+        require(_contractID >= 0 && _contractID <= contractCount, "The contract ID must be valid");
 
         PaymentContract memory _contract = paymentContracts[_contractID];
+        require(keccak256(bytes(_contract.contractStatus)) == keccak256(bytes(CONTRACT_STATUS['NOT_REVIEWED'])), "The Contract must be in not reviewed status to accept it");
+        require(_contract.expiryDate > block.timestamp, "A contract cannot be accepted after expiry date");
         if(_contract.createdBySeller){
             require (msg.sender == _contract.buyer, "Since the contract was created by the seller, only the buyer can accept it");
         } else {
@@ -158,7 +194,7 @@ contract ColPay {
         PaymentContract memory _contract = paymentContracts[_contractID];
         require(keccak256(bytes(_contract.contractStatus)) == keccak256(bytes(CONTRACT_STATUS['NOT_REVIEWED'])), "The Contract must be in not reviewed status to reject it");
 
-        (msg.sender == _contract.buyer || msg.sender == _contract.seller, "Only the buyer or seller can reject a contract (either participant can)");
+        require(msg.sender == _contract.buyer || msg.sender == _contract.seller, "Only the buyer or seller can reject a contract (either participant can)");
 
         // Update the buyers potential debt
         potentialDebt[_contract.buyer] = potentialDebt[_contract.buyer] - _contract.totalAmount;
@@ -173,7 +209,9 @@ contract ColPay {
 
         PaymentContract memory _contract = paymentContracts[_contractID];
         require(block.timestamp > _contract.expiryDate, "The contract expiry date must be in the past in order to expire the contract");
-
+        require(
+            keccak256(bytes(_contract.contractStatus)) == keccak256(bytes(CONTRACT_STATUS['ACCEPTED']))
+            || keccak256(bytes(_contract.contractStatus)) == keccak256(bytes(CONTRACT_STATUS['MISSING_PAYMENT'])), "The Contract must be in accepted or missing payment status to expire");
         uint remainingValue = _contract.totalAmount - _contract.amountPaid;
 
         makeTransaction(_contractID, remainingValue);
@@ -213,7 +251,7 @@ contract ColPay {
 
     // Make a Transaction
     // will move value from buyer to seller & update the remaining amount to contract 
-    // this function should use from statement in metadata when called 
+    // this function should use from statement in metadata when called
     function makeTransaction (uint _contractID, uint _value) public{ 
         // Check for valid requests
         require(_contractID > 0 && _contractID <= contractCount, "The contract ID must be valid");
@@ -227,23 +265,35 @@ contract ColPay {
                 || keccak256(bytes(_contract.contractStatus)) == keccak256(bytes(CONTRACT_STATUS['MISSING_PAYMENT'])), 
                 "The contract status must allow for payment");
         require(_contract.seller == msg.sender || _contract.buyer == msg.sender || owner == msg.sender, "Only Buyer, Seller or ColPay can make transactions in a contract");
-        require(block.timestamp > DateTimeLibrary.DateTimeLibrary.addDays(_contract.startDate, _contract.daysToOpen), "Enough days have to have past in order for the contract to allow for transactions");
+        uint currentTime = block.timestamp;
+        
+        if(msg.sender == _contract.seller){
+            require(currentTime > DateTimeLibrary.DateTimeLibrary.addDays(_contract.startDate, _contract.daysToOpen), "Enough days have to have past in order for the contract to allow for transactions");
+        }
 
-        uint totalContractTime = DateTimeLibrary.DateTimeLibrary.diffSeconds(_contract.startDate, _contract.expiryDate);
-        uint elapsedContractTime = DateTimeLibrary.DateTimeLibrary.diffSeconds(_contract.startDate, block.timestamp);
-        uint percentageOfElapsedTime = (elapsedContractTime * 100) / totalContractTime;
-        uint percentagePayable = (percentageOfElapsedTime * _contract.speed)/ 100;
-        uint maxTotalCurrentTotalPayment = (percentagePayable * _contract.totalAmount) / 100;
+        uint maxTotalCurrentTotalPayment;
 
-        require(maxTotalCurrentTotalPayment <= _contract.amountPaid + _value, "The Contract cannot exceed the maximum amount allowed by the speed.");
+        if(msg.sender == _contract.seller && currentTime < _contract.expiryDate){
+           
+            uint totalContractTime = _contract.expiryDate - _contract.startDate;
+            uint elapsedContractTime = currentTime - _contract.startDate;
+            uint percentageOfElapsedTime = (elapsedContractTime * 100) / totalContractTime;
+            uint percentagePayable = (percentageOfElapsedTime * _contract.speed)/ 100;
+            maxTotalCurrentTotalPayment = (percentagePayable * _contract.totalAmount) / 100;
+            
+        } else {
+            maxTotalCurrentTotalPayment = _contract.totalAmount;
+        }
+
+        require(maxTotalCurrentTotalPayment >= _contract.amountPaid + _value, "The Contract cannot exceed the maximum amount allowed by the speed.");
 
         Transaction memory _transaction;
         
-        if (cpToken.balanceOf(msg.sender) < _value){
+        if (cpToken.balanceOf(_contract.buyer) < _value){
 
             _contract.contractStatus = CONTRACT_STATUS['MISSING_PAYMENT'];
             isBlocked[_contract.buyer] = true;
-            _transaction = Transaction(block.timestamp, _value, false);
+            _transaction = Transaction(currentTime, _value, false);
 
         } else {
 
@@ -253,7 +303,6 @@ contract ColPay {
 
                 for (uint i = 0; i < paymentContractsHeldPerAddress[_contract.buyer].length; i++){
                     if(_contractID != i 
-                      && transactionLists[i][transactionLists[i].length -1].successful == false
                       && keccak256(bytes(paymentContracts[i].contractStatus)) == keccak256(bytes(CONTRACT_STATUS['MISSING_PAYMENT']))
                       ){
                           hasOtherMissingPayments = true;
@@ -264,13 +313,13 @@ contract ColPay {
                 }       
             }
 
-            _transaction = Transaction(block.timestamp, _value, true);
+            _transaction = Transaction(currentTime, _value, true);
 
             // Update the buyers total debt
             incurredDebt[_contract.buyer] = incurredDebt[_contract.buyer] + _contract.totalAmount;
 
             // Make transaction of cpTokens
-            cpToken.transfer(_contract.seller, _value);
+            cpToken.transferFrom(_contract.buyer, _contract.seller, _value);
 
             // Update the amount of the contract paid
             _contract.amountPaid = totalPayment;
@@ -287,8 +336,8 @@ contract ColPay {
         transactionLists[_contractID].push(_transaction);
 
         paymentContracts[_contractID] = _contract;
-
-        emit TransactionMade(block.timestamp, _contractID, _value, _transaction.successful);
+         
+        emit TransactionMade(currentTime, _contractID, _value, _transaction.successful);
 
     }
 
