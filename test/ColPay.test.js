@@ -160,14 +160,20 @@ function sleep(ms) {
 
 
       })
-      
+
       it('Allows Users to Accept/Reject Contracts:\n'+
          '        -> Only Contract Recipient can Accept the Contract\n'+
          '        -> Can only Accept a Contract that the Buyer can Pay (including their other contracts)\n'+
          '        -> Can only Accept a Contract that has not been reviewed yet\n'+
+         '        -> Adjusts Potential & Incurred Debt of Buyer after Acceptance/Rejection\n'+
          '        -> Can only Accept a Contract that has not expired'
          
          , async () => {
+
+        let potentialDebtBuyer = await colPay.potentialDebt(buyer)
+        let incurredDebtBuyer = await colPay.incurredDebt(buyer)
+        assert.equal(potentialDebtBuyer.toString(), tokens('10'), "The potential debt before the acceptance is not correct")
+        assert.equal(incurredDebtBuyer.toString(), tokens('0'), "The incurred debt before the acceptance is not correct")
 
         // SUCCESS (with acceptance)
         let acceptance = await colPay.acceptPaymentContract(firstContractID, {from: seller_1})
@@ -175,18 +181,36 @@ function sleep(ms) {
         assert.equal(event.id.toNumber(), firstContractID, 'Id is not correct')
         assert.equal(event.statusUpdatedBy, seller_1, 'Status updated by is not correct')
         assert.equal(event.status.toString(), ColPay.contractStatus.ACCEPTED.toString(), 'Contract Status is not Accepted')
+
+        potentialDebtBuyer = await colPay.potentialDebt(buyer)
+        incurredDebtBuyer = await colPay.incurredDebt(buyer)
+        assert.equal(potentialDebtBuyer.toString(), tokens('0'), "The potential debt after the acceptance is not correct")
+        assert.equal(incurredDebtBuyer.toString(), tokens('10'), "The incurred debt after the acceptance is not correct")
         
 
         // FAILURE: Accept a contract that exceeds current balance of buyer
         let secondContract = await colPay.createPaymentContract("Test", tokens('1000'), seller_1, toSolidityDate(createdTime_JS), toSolidityDate(expiryTime_JS), 10, 100, false,  { from: buyer })
         let secondContractID = secondContract.logs[0].args.id
         await colPay.acceptPaymentContract(secondContractID, {from: seller_1}).should.be.rejected
+
         // FAILURE: Accept a contract from an address different than the recipient
+        potentialDebtBuyer = await colPay.potentialDebt(buyer)
+        incurredDebtBuyer = await colPay.incurredDebt(buyer)
+
+        assert.equal(potentialDebtBuyer.toString(), tokens('1000'), "The potential debt before the rejection is not correct")
+        assert.equal(incurredDebtBuyer.toString(), tokens('10'), "The incurred debt before the rejection is not correct")
+
         let thirdContract = await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(createdTime_JS), toSolidityDate(expiryTime_JS), 10, 100, false,  { from: buyer })
         let thirdContractID = thirdContract.logs[0].args.id
         await colPay.acceptPaymentContract(thirdContractID, {from: buyer}).should.be.rejected
         
         let rejection = await colPay.rejectPaymentContract(thirdContractID, {from: seller_1})
+        await colPay.rejectPaymentContract(secondContractID, {from: seller_1})
+
+        potentialDebtBuyer = await colPay.potentialDebt(buyer)
+        incurredDebtBuyer = await colPay.incurredDebt(buyer)
+        assert.equal(potentialDebtBuyer.toString(), tokens('0'), "The potential debt after the rejection is not correct")
+        assert.equal(incurredDebtBuyer.toString(), tokens('10'), "The incurred debt after the rejection is not correct")
 
         // FAILURE: Accept a contract with an invalid status
         await colPay.acceptPaymentContract(thirdContractID, {from: seller_1}).should.be.rejected
@@ -222,6 +246,8 @@ function sleep(ms) {
          '        -> Stops only Seller from Making a Transaction before the day the contract is unlocked\n'+
          '        -> Stops Transactions that Exceed Contract Value\n'+
          '        -> Adjusts Balance of Buyer and Seller correctly\n'+
+         '        -> Adjusts Amount Paid of a Contract after a transaction\n'+
+         '        -> Adjusts Incurred Debt of Buyer after Transaction\n'+
          '        -> Updates the status of the Contract to: Missing Paymnet or Fulfilled if necessary'
 
       , async () => {
@@ -231,15 +257,26 @@ function sleep(ms) {
         let partiallyPayableContractID = await colPay.contractCount()-1
         await colPay.acceptPaymentContract(partiallyPayableContractID, {from: seller_1})
 
-        await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -5)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer })
-        let nonPayableContractID = await colPay.contractCount()-1
-        await colPay.acceptPaymentContract(nonPayableContractID, {from: seller_1})
+        // Because of previous tests buyer has some debt, check it is expected value:
+        let potentialDebtBuyer = await colPay.potentialDebt(buyer)
+        let incurredDebtBuyer = await colPay.incurredDebt(buyer)
+        assert.equal(potentialDebtBuyer.toString(), tokens('20'), "The potential debt before the transaction is not correct")
+        assert.equal(incurredDebtBuyer.toString(), tokens('20'), "The incurred debt before the transaction is not correct")
 
         // SUCCESS
         let beforeTransactionTime = toSolidityDate(Date.now())
         let firstTransaction = await colPay.makeTransaction(partiallyPayableContractID, tokens('1'), {from: seller_1})
         let afterTransactionTime = toSolidityDate(Date.now())
         const firtTransactionEvent = firstTransaction.logs[0].args
+
+        potentialDebtBuyer = await colPay.potentialDebt(buyer)
+        incurredDebtBuyer = await colPay.incurredDebt(buyer)
+        assert.equal(potentialDebtBuyer.toString(), tokens('20'), "The potential debt after the transaction is not correct")
+        assert.equal(incurredDebtBuyer.toString(), tokens('19'), "The incurred debt after the transaction is not correct")
+
+        await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -5)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer })
+        let nonPayableContractID = await colPay.contractCount()-1
+        await colPay.acceptPaymentContract(nonPayableContractID, {from: seller_1})
 
         assert.equal(firtTransactionEvent.value, tokens('1'), 'Value is not correct')
         assert.equal(firtTransactionEvent.successful, true, 'Value is not correct')
@@ -251,6 +288,9 @@ function sleep(ms) {
         assert.equal(seller_1Balance.toString(), tokens('101'), "Seller Balance is not correct")
         assert.equal(buyerBalance.toString(), tokens('99'), "Buyer Balance is not correct")
 
+        let partiallyPayableContract = await colPay.paymentContracts(partiallyPayableContractID)
+        assert.equal(partiallyPayableContract.amountPaid.toString(), tokens('1'), "The contract is not missed payment")
+
         // FAILURE: Seller requests Payment to early
         await colPay.makeTransaction(nonPayableContractID, tokens('1'), {from: seller_1}).should.be.rejected
         // FAILURE: Excess payment from seller
@@ -260,6 +300,9 @@ function sleep(ms) {
 
         // SUCCESS: Finishing the contract early
         await colPay.makeTransaction(partiallyPayableContractID, tokens('9'), {from: buyer})
+
+        incurredDebtBuyer = await colPay.incurredDebt(buyer)
+        assert.equal(incurredDebtBuyer.toString(), tokens('20'), 'Incurred debt is not reduced back to 10 after payment')
 
         seller_1Balance = await cpToken.balanceOf(seller_1)
         buyerBalance = await cpToken.balanceOf(buyer)
@@ -283,6 +326,7 @@ function sleep(ms) {
 
         let nonPayableContract = await colPay.paymentContracts(nonPayableContractID)
         assert.equal(nonPayableContract.status.toString(), ColPay.contractStatus.FULFILLED.toString(), "The contract is not fulfilled")
+        assert.equal(nonPayableContract.amountPaid.toString(), tokens('10'), "The amount paid id not correct")
 
         // Missing payment status
         await colPay.issueTokens(tokens('10'), buyer_3, { from: owner })

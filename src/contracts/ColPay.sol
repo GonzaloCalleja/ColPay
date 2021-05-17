@@ -176,8 +176,8 @@ contract ColPay {
         }
 
         // UPDATE STATE VARIABLES FOR DEBT
-        potentialDebt[_contract.buyer] = potentialDebt[_contract.buyer] - _contract.totalAmount;
-        incurredDebt[_contract.buyer] = incurredDebt[_contract.buyer] + _contract.totalAmount;
+        potentialDebt[_contract.buyer] -= _contract.totalAmount;
+        incurredDebt[_contract.buyer] += _contract.totalAmount;
 
         // CHANGE CONTRACT STATUS
         _contract.status = contractStatus.ACCEPTED;
@@ -196,7 +196,7 @@ contract ColPay {
         require(msg.sender == _contract.buyer || msg.sender == _contract.seller, "Only the buyer or seller can reject a contract (either participant can)");
 
         // STATE VARIABLES FOR POTENTIAL DEBT 
-        potentialDebt[_contract.buyer] = potentialDebt[_contract.buyer] - _contract.totalAmount;
+        potentialDebt[_contract.buyer] -= _contract.totalAmount;
 
         // CHANGE CONTRACT STATUS
         _contract.status = contractStatus.REJECTED;
@@ -212,9 +212,8 @@ contract ColPay {
         // CHECKS
         require(_contractID >= 0 && _contractID < contractCount, "The contract ID must be valid");
         require(block.timestamp > _contract.expiryDate, "The contract expiry date must be in the past in order to expire the contract");
-        require(
-            _contract.status == contractStatus.ACCEPTED
-            || _contract.status == contractStatus.MISSING_PAYMENT, "The Contract must be in accepted or missing payment status to expire");
+        require(_contract.status == contractStatus.ACCEPTED || _contract.status == contractStatus.MISSING_PAYMENT, "The Contract must be in accepted or missing payment status to expire");
+        
         uint remainingValue = _contract.totalAmount - _contract.amountPaid;
 
         // IF CONTRACT EXPIRED MAKE TRANSACTION FOR REMAINING VALUE
@@ -237,11 +236,9 @@ contract ColPay {
             PaymentContract memory _contract = paymentContracts[i];
 
             // IF THE CONTRACTS HAVE A MISSING PAYMENT, THEN ATTEMPT TO REPEAT LAST (FAILED) TRANSACTION
-            if (transactionLists[i].length > 0){
+            if (_contract.status == contractStatus.MISSING_PAYMENT){
                 Transaction memory lastTransaction = transactionLists[i][transactionLists[i].length - 1];
-                if(!lastTransaction.successful){
-                    makeTransaction(i, lastTransaction.value);
-                }
+                makeTransaction(i, lastTransaction.value);
             }
             
             // IF CONTRACTS EXPIRY DATE IS IN THE PAST & THEY ARE STILL CONSIDERED ACCEPTED, THEN EXPIRE THEM.
@@ -325,7 +322,7 @@ contract ColPay {
             _transaction = Transaction(currentTime, _contractID, _value, true);
 
             // Update the buyers total debt
-            incurredDebt[_contract.buyer] = incurredDebt[_contract.buyer] + _contract.totalAmount;
+            incurredDebt[_contract.buyer] -= _value;
 
             // Make transaction of cpTokens
             cpToken.transferFrom(_contract.buyer, _contract.seller, _value);
