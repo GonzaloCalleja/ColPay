@@ -24,6 +24,7 @@ contract ColPay {
 
     struct Transaction {
         uint256 date;
+        uint contractId;
         uint value;
         bool successful;
     }
@@ -244,7 +245,7 @@ contract ColPay {
                 && (keccak256(bytes(_contract.contractStatus)) == keccak256(bytes(CONTRACT_STATUS['ACCEPTED'])))) {
                 expirePaymentContract(i);
             } else if (keccak256(bytes(_contract.contractStatus)) == keccak256(bytes(CONTRACT_STATUS['MISSING_PAYMENT']))){
-                makeTransaction(i, transactionLists[i][transactionLists[i].length -1].value);
+                makeTransaction(i, 20); //transactionLists[i][transactionLists[i].length -1].value);
             }
         }
     }
@@ -266,7 +267,7 @@ contract ColPay {
                 "The contract status must allow for payment");
         require(_contract.seller == msg.sender || _contract.buyer == msg.sender || owner == msg.sender, "Only Buyer, Seller or ColPay can make transactions in a contract");
         uint currentTime = block.timestamp;
-        
+
         if(msg.sender == _contract.seller){
             require(currentTime > DateTimeLibrary.DateTimeLibrary.addDays(_contract.startDate, _contract.daysToOpen), "Enough days have to have past in order for the contract to allow for transactions");
         }
@@ -291,9 +292,9 @@ contract ColPay {
         
         if (cpToken.balanceOf(_contract.buyer) < _value){
 
-            _contract.contractStatus = CONTRACT_STATUS['MISSING_PAYMENT'];
+            updatePaymentContractStatus(_contractID, CONTRACT_STATUS['MISSING_PAYMENT']);
             isBlocked[_contract.buyer] = true;
-            _transaction = Transaction(currentTime, _value, false);
+            _transaction = Transaction(currentTime, _contractID, _value, false);
 
         } else {
 
@@ -313,7 +314,7 @@ contract ColPay {
                 }       
             }
 
-            _transaction = Transaction(currentTime, _value, true);
+            _transaction = Transaction(currentTime, _contractID, _value, true);
 
             // Update the buyers total debt
             incurredDebt[_contract.buyer] = incurredDebt[_contract.buyer] + _contract.totalAmount;
