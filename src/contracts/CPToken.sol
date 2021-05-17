@@ -25,9 +25,6 @@ contract CPToken {
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
-    constructor() {
-    }
-
     function setOwner(address _owner) public {
         require(owner==address(0));
         owner = _owner;

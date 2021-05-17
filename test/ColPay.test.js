@@ -95,9 +95,11 @@ function sleep(ms) {
     });
 
       it('Creates New Payment Contracts Correctly both from Seller and Buyer side', async () => {
+
+        const event = firstContract.logs[0].args
+
         // SUCCESS
         assert.equal(contractCount, 1)
-        const event = firstContract.logs[0].args
         assert.equal(event.id.toNumber(), contractCount.toNumber() - 1, 'Id is not correct')
         assert.equal(event.name, "Test", 'Name is not correct')
         assert.equal(event.totalAmount, tokens('10'), 'Total Amount is not correct')
@@ -108,7 +110,7 @@ function sleep(ms) {
         assert.equal(event.expiryDate, toSolidityDate(expiryTime_JS), 'Expiry Date is not correct')
         assert.equal(event.daysToOpen.toNumber(), 10, 'Days to Open is not correct')
         assert.equal(event.speed.toNumber(), 100, 'Speed is not correct')
-        assert.equal(event.contractStatus, 'NOT_REVIEWED', 'Status is not correct')
+        assert.equal(event.status.toString(), ColPay.contractStatus.NOT_REVIEWED.toString(), 'Status is not correct')
         assert.equal(event.createdBySeller, false, 'Created by seller (yes/no) is not correct')
       })
 
@@ -120,6 +122,7 @@ function sleep(ms) {
           '        -> Buyer Address = Seller Address\n'+
           '        -> Stops Accounts with Missing Payments from creating contracts'
           , async () => {
+            
         // FAILURE: Negative total amount
         await colPay.createPaymentContract("Test", tokens('-10'), seller_1, toSolidityDate(createdTime_JS), toSolidityDate(expiryTime_JS), 10, 100, false,  { from: buyer }).should.be.rejected
         // FAILURE: Finished already
@@ -135,7 +138,7 @@ function sleep(ms) {
         
         // FAILURE: Created by blocked buyer
         await colPay.issueTokens(tokens('10'), buyer_2, { from: owner })
-        let partiallyPayableContract = await colPay.createPaymentContract("Test", tokens('8'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer_2 })
+        await colPay.createPaymentContract("Test", tokens('8'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer_2 })
         let partiallyPayableContractID = await colPay.contractCount()-1
 
         // Buyer initially has enough funds to pay the contract
@@ -157,6 +160,7 @@ function sleep(ms) {
 
 
       })
+      
       it('Allows Users to Accept/Reject Contracts:\n'+
          '        -> Only Contract Recipient can Accept the Contract\n'+
          '        -> Can only Accept a Contract that the Buyer can Pay (including their other contracts)\n'+
@@ -170,7 +174,8 @@ function sleep(ms) {
         const event = acceptance.logs[0].args
         assert.equal(event.id.toNumber(), firstContractID, 'Id is not correct')
         assert.equal(event.statusUpdatedBy, seller_1, 'Status updated by is not correct')
-        assert.equal(event.contractStatus, 'ACCEPTED', 'Contract Status is not correct')
+        assert.equal(event.status.toString(), ColPay.contractStatus.ACCEPTED.toString(), 'Contract Status is not Accepted')
+        
 
         // FAILURE: Accept a contract that exceeds current balance of buyer
         let secondContract = await colPay.createPaymentContract("Test", tokens('1000'), seller_1, toSolidityDate(createdTime_JS), toSolidityDate(expiryTime_JS), 10, 100, false,  { from: buyer })
@@ -190,7 +195,7 @@ function sleep(ms) {
         const rejection_event = rejection.logs[0].args
         assert.equal(rejection_event.id.toNumber(), thirdContractID.toNumber(), 'Id is not correct')
         assert.equal(rejection_event.statusUpdatedBy, seller_1, 'Status updated by is not correct')
-        assert.equal(rejection_event.contractStatus, 'REJECTED', 'Contract Status is not correct')
+        assert.equal(rejection_event.status.toString(), ColPay.contractStatus.REJECTED.toString(), 'Contract Status is not Rejected')
 
         // FAILURE: Reject a contract with an invalid status
         await colPay.rejectPaymentContract(firstContractID, {from: seller_1}).should.be.rejected
@@ -201,7 +206,7 @@ function sleep(ms) {
         await colPay.rejectPaymentContract(fourthContractID, {from: seller_2}).should.be.rejected
 
         // FAILURE: Accepting an expired contract 
-        let expiredContract = await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(Date.now()+2000), 10, 100, false,  { from: buyer })
+        await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(Date.now()+2000), 10, 100, false,  { from: buyer })
         let expiredContractID = await colPay.contractCount()-1
 
         // Wait for the contract to expire
@@ -222,11 +227,11 @@ function sleep(ms) {
       , async () => {
         // Success create a contract that allows for payment and make a transaction
 
-        let partiallyPayableContract = await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer })
+        await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer })
         let partiallyPayableContractID = await colPay.contractCount()-1
         await colPay.acceptPaymentContract(partiallyPayableContractID, {from: seller_1})
 
-        let nonPayableContract = await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -5)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer })
+        await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -5)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer })
         let nonPayableContractID = await colPay.contractCount()-1
         await colPay.acceptPaymentContract(nonPayableContractID, {from: seller_1})
 
@@ -234,13 +239,12 @@ function sleep(ms) {
         let beforeTransactionTime = toSolidityDate(Date.now())
         let firstTransaction = await colPay.makeTransaction(partiallyPayableContractID, tokens('1'), {from: seller_1})
         let afterTransactionTime = toSolidityDate(Date.now())
-        const firtTransactionEvent = firstTransaction.logs[1].args
+        const firtTransactionEvent = firstTransaction.logs[0].args
 
         assert.equal(firtTransactionEvent.value, tokens('1'), 'Value is not correct')
         assert.equal(firtTransactionEvent.successful, true, 'Value is not correct')
         assert.equal(firtTransactionEvent.contractID, partiallyPayableContractID, 'Contract is not correct')
         assert.equal(firtTransactionEvent.date.toNumber() >= beforeTransactionTime && firtTransactionEvent.date.toNumber() <= afterTransactionTime, true, 'Transaction Date time is not correct')
-
         let seller_1Balance = await cpToken.balanceOf(seller_1)
         let buyerBalance = await cpToken.balanceOf(buyer)
 
@@ -274,14 +278,16 @@ function sleep(ms) {
 
         // Updates the status of the Contract to: Missing Paymnet or Fulfilled if necessary
         let transaction = await colPay.makeTransaction(nonPayableContractID, tokens('8'), {from: buyer})
-        let status = transaction.logs[0].args.contractStatus
-        assert.equal(status, 'FULFILLED', "Contract Status not updated correctly")
+        let transactionEvent = transaction.logs[0].args
+        assert.equal(transactionEvent.status.toString(), ColPay.contractStatus.FULFILLED.toString(), "Contract Status not updated correctly")
+
+        let nonPayableContract = await colPay.paymentContracts(nonPayableContractID)
+        assert.equal(nonPayableContract.status.toString(), ColPay.contractStatus.FULFILLED.toString(), "The contract is not fulfilled")
 
         // Missing payment status
-
         await colPay.issueTokens(tokens('10'), buyer_3, { from: owner })
         
-        let missingPaymentContract = await colPay.createPaymentContract("Test", tokens('8'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer_3 })
+        await colPay.createPaymentContract("Test", tokens('8'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer_3 })
         let missingPaymetContractID = await colPay.contractCount()-1
 
         // Buyer initially has enough funds to pay the contract
@@ -293,31 +299,26 @@ function sleep(ms) {
           
         // Seller Requests Transaction
         transaction = await colPay.makeTransaction(missingPaymetContractID, tokens('1'), {from: seller_1})
-        status = transaction.logs[0].args.contractStatus
-        assert.equal(status, 'MISSING_PAYMENT', "Contract Status not updated correctly")
+        transactionEvent = transaction.logs[0].args
+        assert.equal(transactionEvent.status.toString(), ColPay.contractStatus.MISSING_PAYMENT.toString(), "Contract Status not updated correctly")
+
+        let missingPaymentContract = await colPay.paymentContracts(missingPaymetContractID)
+        assert.equal(missingPaymentContract.status.toString(), ColPay.contractStatus.MISSING_PAYMENT.toString(), "The contract is not missed payment")
 
       })
 
       it('Handles Expired Contracts and Missing Payments\n'+
          '        -> Detects Expired Contracts\n'+
-         '        -> Executes the Final Payment\n'+
-         '        -> Updates Status\n'+
+         '        -> Fulfills Expired Contracts\n'+
          '        -> Checks for Missing Payments and Requests Them\n'+
          '        -> Unblocks Addresses if the no longer have missing payments'
       
       , async () => {
-        // SETUP AN EXPIRED CONTRACT
-        let expiredContract = await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(Date.now()+5000), 10, 100, false,  { from: buyer })
-        let expiredContractID = await colPay.contractCount()-1
-        await colPay.acceptPaymentContract(expiredContractID, {from: seller_1})
 
-        // SETUP A MISSED PAYMENT CONTRACT WHICH BUYER CAN NOW PAY
-        // Wait for the contract to expire
-        await sleep(6000)
-
+        // SETUP A MISSED PAYMENT CONTRACT & THEN TRANSFER FUNDS TO BUYER
         await colPay.issueTokens(tokens('20'), buyer_4, { from: owner })
 
-        let partiallyPayableContract = await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer_4 })
+        await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(addDays(createdTime_JS, 20)), 10, 100, false,  { from: buyer_4 })
         let partiallyPayableContractID = await colPay.contractCount()-1
 
         // Buyer initially has enough funds to pay the contract
@@ -326,21 +327,30 @@ function sleep(ms) {
         // Later they transfer the funds to someone else out of their own initiative
         let buyerBalance = await cpToken.balanceOf(buyer_4)
         await cpToken.transfer(seller_2, buyerBalance, {from: buyer_4})
-        await colPay.makeTransaction(partiallyPayableContractID, tokens('1'), {from: seller_1})
+        await colPay.makeTransaction(partiallyPayableContractID, tokens('3'), {from: seller_1})
 
         await colPay.issueTokens(tokens('20'), buyer_4, { from: owner })
 
         let blocked = await colPay.isBlocked(buyer_4)
         assert.equal(blocked, true, 'Buyer is not blocked')
 
-        await colPay.checkForRequiredPayments({from: owner})
-        // Buyer has to pay expired contract
+        // SETUP AN EXPIRED CONTRACT
+        await colPay.createPaymentContract("Test", tokens('10'), seller_1, toSolidityDate(addDays(createdTime_JS, -20)), toSolidityDate(Date.now()+5000), 10, 100, false,  { from: buyer })
+        let expiredContractID = await colPay.contractCount()-1
+        await colPay.acceptPaymentContract(expiredContractID, {from: seller_1})
+
+        // Wait for the contract to expire
+        await sleep(6000)
+
+        let checkEvent = await colPay.checkForRequiredPayments({from: owner})
 
         blocked = await colPay.isBlocked(buyer_4)
         assert.equal(blocked, false, 'Buyer is blocked')
 
+        let expiredContract = await colPay.paymentContracts(expiredContractID)
+        assert.equal(expiredContract.status.toString(), ColPay.contractStatus.FULFILLED.toString(), "The contract was not fulfilled after expiring")
         
       })
+      
     })
-
   })
