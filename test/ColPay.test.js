@@ -164,7 +164,7 @@ function sleep(ms) {
       it('Allows Users to Accept/Reject Contracts:\n'+
          '        -> Only Contract Recipient can Accept the Contract\n'+
          '        -> Can only Accept a Contract that the Buyer can Pay (including their other contracts)\n'+
-         '        -> Can only Accept a Contract that has not been reviewed yet\n'+
+         '        -> Can only Accept a New Contract\n'+
          '        -> Adjusts Potential & Incurred Debt of Buyer after Acceptance/Rejection\n'+
          '        -> Can only Accept a Contract that has not expired'
          
@@ -353,7 +353,7 @@ function sleep(ms) {
 
       it('Handles Expired Contracts and Missing Payments\n'+
          '        -> Detects Expired Contracts\n'+
-         '        -> Fulfills Expired Contracts\n'+
+         '        -> Fulfills (Executes Payment) Expired Contracts\n'+
          '        -> Checks for Missing Payments and Requests Them\n'+
          '        -> Unblocks Addresses if the no longer have missing payments'
       
@@ -386,7 +386,7 @@ function sleep(ms) {
         // Wait for the contract to expire
         await sleep(6000)
 
-        let checkEvent = await colPay.checkForRequiredPayments({from: owner})
+        await colPay.checkForRequiredPayments({from: owner})
 
         blocked = await colPay.isBlocked(buyer_4)
         assert.equal(blocked, false, 'Buyer is blocked')

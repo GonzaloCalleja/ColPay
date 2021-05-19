@@ -205,7 +205,7 @@ contract ColPay {
     }
 
     // Finalize a Payment Contract
-    function expirePaymentContract(uint _contractID) public {
+    function expirePaymentContract(uint _contractID) public returns(uint payment, bool success){
 
         PaymentContract memory _contract = paymentContracts[_contractID];
 
@@ -217,15 +217,18 @@ contract ColPay {
         uint remainingValue = _contract.totalAmount - _contract.amountPaid;
 
         // IF CONTRACT EXPIRED MAKE TRANSACTION FOR REMAINING VALUE
-        makeTransaction(_contractID, remainingValue);
+        success = makeTransaction(_contractID, remainingValue);
+        return(remainingValue, success);
     }
 
     // DETECTING CONTRACTS WITH MISSED PAYMENT OR EXPIRED STATUS & ATTEMPTING TRANSACTION
     // This function can be executed periodically by ColPay through a script
     // It will be used as an automatic way of executing payments on expired contracts and priorizing contracts with missing payments
-    function checkForRequiredPayments() public {
+    function checkForRequiredPayments() public returns (uint[] memory payments, bool[] memory success) {
 
         uint currentTime = block.timestamp;
+        payments = new uint[](contractCount);
+        success = new bool[](contractCount);
 
         // CHECKS
         require(msg.sender == owner, "The caller must be ColPay, they control the script for detecting expired contracts and liquidating them.");
@@ -233,19 +236,26 @@ contract ColPay {
         // ITERATE THROUGH ALL CONTRACTS & LOOK AT THEIR STATUS
    
         for (uint i=0; i<contractCount; i++) {
+            uint payment = 0;
+            bool successful = false;
             PaymentContract memory _contract = paymentContracts[i];
 
             // IF THE CONTRACTS HAVE A MISSING PAYMENT, THEN ATTEMPT TO REPEAT LAST (FAILED) TRANSACTION
             if (_contract.status == contractStatus.MISSING_PAYMENT){
                 Transaction memory lastTransaction = transactionLists[i][transactionLists[i].length - 1];
-                makeTransaction(i, lastTransaction.value);
+                successful = makeTransaction(i, lastTransaction.value);
+                payment = lastTransaction.value;
             }
             
             // IF CONTRACTS EXPIRY DATE IS IN THE PAST & THEY ARE STILL CONSIDERED ACCEPTED, THEN EXPIRE THEM.
             if( currentTime > _contract.expiryDate && _contract.status == contractStatus.ACCEPTED ) {
-                expirePaymentContract(i);
-            } 
+                (payment, successful) = expirePaymentContract(i);
+            }
+            payments[i] = payment;
+            success[i] = successful;
         }
+
+        return(payments, success);
         
     }
 
@@ -259,7 +269,7 @@ contract ColPay {
     // Make a Transaction
     // will move value from buyer to seller & update the remaining amount to contract 
     // this function should use from statement in metadata when called
-    function makeTransaction (uint _contractID, uint _value) public{ 
+    function makeTransaction (uint _contractID, uint _value) public returns (bool success){ 
 
         uint currentTime = block.timestamp;
         PaymentContract memory _contract = paymentContracts[_contractID];
@@ -303,6 +313,8 @@ contract ColPay {
 
             changeAccountBlockedStatus(_contract.buyer, _contractID, newTransactionID, true);
 
+            success = false;
+
         } else {
 
             if(isBlocked[_contract.buyer]){
@@ -341,6 +353,7 @@ contract ColPay {
                 _contract.status = contractStatus.ACCEPTED;
                 emit PaymentContractStatusUpdate(_contractID, msg.sender, contractStatus.ACCEPTED);
             }
+            success = true;
         }
 
         // UPDATE STATE VARIABLES WITH TRANSACTION
@@ -349,6 +362,15 @@ contract ColPay {
          
         emit TransactionMade(currentTime, _contractID, _value, _transaction.successful);
 
+        return success;
+    }
+
+    function getTransactionNumber(uint16 _id) public view returns (uint){
+        return transactionLists[_id].length;
+    }
+
+    function getContractNumber(address _address) public view returns (uint){
+        return paymentContractsHeldPerAddress[_address].length;
     }
 
 }
