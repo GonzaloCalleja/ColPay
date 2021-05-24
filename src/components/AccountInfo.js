@@ -1,7 +1,7 @@
 
 const AccountInfo = ({account, potentialDebt, incurredDebt, balance, isBlocked}) => {
     return (
-        <div>
+        <div className='col'>
             <h4>Acccount: {account}</h4>
             <h4>Balance: {window.web3.utils.fromWei(balance.toString(), 'Ether')} Eth</h4>
             <h4>Potential Debt: {window.web3.utils.fromWei(potentialDebt.toString(), 'Ether')} Eth</h4>

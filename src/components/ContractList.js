@@ -3,6 +3,8 @@ import { useState } from 'react'
 const ContractList = ({ account, contracts, onAccept, onReject }) => {
 
     return (
+      <>
+        <h2>Contracts</h2>
         <table className="table">
           <thead>
             <tr>
@@ -89,6 +91,7 @@ const ContractList = ({ account, contracts, onAccept, onReject }) => {
               })}
           </tbody>
         </table>
+        </>
     )
 }
 

@@ -16,7 +16,7 @@ const App = () => {
 
   const[cpTokenBalance, setCPTokenBalance] = useState(0)
   const[account, setAccount] = useState('')
-  const[contractCount, setContractCount] = useState(0)
+  //const[contractCount, setContractCount] = useState(0)
   const[contracts, setContracts] = useState([])
   const[isBlocked, setIsBlocked] = useState(false)
   const[incurredDebt, setIncurredDebt] = useState(0)
@@ -59,7 +59,7 @@ const App = () => {
   
         
         const contractCount = await colPay.methods.getContractNumber(account).call()
-        setContractCount(contractCount)
+        //setContractCount(contractCount)
 
         let contractsToUpdate = []
 
@@ -169,30 +169,38 @@ const App = () => {
     })
   }
 
+  const makeTransaction = async (id, value)=>{
+    setLoading(true)
+
+    colPay.methods.makeTransaction(id, value).send({from: account})
+
+    .once('receipt', (receipt) => {
+      setLoading(false)
+      setReload(!reload)
+    })
+  }
+
+  // Expire
+
   return (
     <div>
       <Navbar account={account}/>
       <div className="container-fluid mt-5">
-        <div className="row">
-          <main role="main" className="col-lg-12 d-flex text-center">
-            <div className="content mr-auto ml-auto">
-              {loading 
-               ? <p id="loader" className="text-center">Loading...</p> 
-               : <Main 
-                      onCreateContract={createPaymentContract}
-                      account={account}
-                      contracts={contracts}
-                      onAccept={acceptContract}
-                      onReject={rejectContract}
-                      balance={cpTokenBalance}
-                      incurredDebt={incurredDebt}
-                      potentialDebt={potentialDebt}
-                      isBlocked={isBlocked}
-                  />
-              }
-            </div>
-          </main>
-        </div>
+        {loading 
+          ? <p className="text-center">Loading...</p> 
+          : <Main 
+                onCreateContract={createPaymentContract}
+                account={account}
+                contracts={contracts}
+                onAccept={acceptContract}
+                onReject={rejectContract}
+                balance={cpTokenBalance}
+                incurredDebt={incurredDebt}
+                potentialDebt={potentialDebt}
+                isBlocked={isBlocked}
+                onTransaction={makeTransaction}
+            />
+        }
       </div>
     </div>
   );

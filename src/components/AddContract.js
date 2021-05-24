@@ -39,7 +39,8 @@ const AddContract = ({onCreateContract}) => {
     }
 
     return (
-        <form onSubmit={onSubmit}>
+        <div className='row'>
+        <form onSubmit={onSubmit} className='content mr-auto ml-auto'>
             <div className ="mb-3 row">
                 <label className="col-sm-4 col-form-label">Name</label>
                 <div className="col-sm-8">
@@ -132,8 +133,9 @@ const AddContract = ({onCreateContract}) => {
                 />
                 <label className="form-check-label">Created by Seller</label>
             </div>
-            <input type='submit' className="btn btn-primary" value='Save Task'/>
+            <input type='submit' className="btn btn-primary" value='Create Contract'/>
         </form>
+        </div>
     )
 }
 
