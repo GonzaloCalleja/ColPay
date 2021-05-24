@@ -1,22 +1,107 @@
-import React, { Component } from 'react';
+import { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import ColPay from '../abis/ColPay.json';
+import CPToken from '../abis/CPToken.json';
 import Web3 from 'web3';
 import './App.css';
-import ColPay from '../abis/ColPay.json';
 import Navbar from './Navbar.js';
 import Main from './Main.js';
 
-class App extends Component {
+//const { projectId, mnemonic, deployer } = require('../../secrets.json');
 
-  async componentWillMount() {
-    await this.loadWeb3()
-    await this.loadBlockchainData()
-  }
+const App = () => {
 
-  // Loading data from metamask -> Code Provided by them
-  async loadWeb3(){
+  const[colPay, setColPay] = useState({})
+  const[cpToken, setCPToken] = useState({})
+
+  const[cpTokenBalance, setCPTokenBalance] = useState(0)
+  const[account, setAccount] = useState('')
+  const[contractCount, setContractCount] = useState(0)
+  const[contracts, setContracts] = useState([])
+  const[isBlocked, setIsBlocked] = useState(false)
+  const[incurredDebt, setIncurredDebt] = useState(0)
+  const[potentialDebt, setPotentialDebt] = useState(0)
+
+  const[loading, setLoading] = useState(true)
+  const[reload, setReload] = useState(true)
+
+
+  // Function called every render. Or whenever change in a value of the array
+
+  useEffect(()=>{
+
+    const getBlockChainData = async ()=> {
+      await loadWeb3()
+      
+      const [colPay, cpToken] = await loadSmartContracts()
+      setColPay(colPay)
+      setCPToken(cpToken)
+
+      const accounts = await window.web3.eth.getAccounts()
+      setAccount(accounts[0])
+    }
+
+    getBlockChainData()
+    setLoading(false)
+
+  }, [])
+
+  useEffect(()=>{
+
+    if(account){
+
+      const getAccountData = async () =>{
+
+        console.log("trigger")
+
+        const cpTokenBalance = await cpToken.methods.balanceOf(account).call()
+        setCPTokenBalance(cpTokenBalance)
+  
+        
+        const contractCount = await colPay.methods.getContractNumber(account).call()
+        setContractCount(contractCount)
+
+        let contractsToUpdate = []
+
+        for(let id = 0; id < contractCount; id++){
+          const contractID = await colPay.methods.paymentContractsHeldPerAddress(account, id).call()
+          const contract = await colPay.methods.paymentContracts(contractID).call()
+          
+          const transactionsCount = await colPay.methods.getTransactionNumber(contractID).call()
+          const transactions = []
+
+          for (let key = 0; key < transactionsCount; key++){
+            const contractTransactions = await colPay.methods.transactionLists(contractID, key).call()
+            transactions.push(contractTransactions)
+          }
+          
+          contract.transactions = transactions
+
+          contractsToUpdate.push(contract)
+        }
+
+        setContracts(contractsToUpdate)
+
+        const isBlocked = await colPay.methods.isBlocked(account).call()
+        setIsBlocked(isBlocked)
+
+        const incurredDebt = await colPay.methods.incurredDebt(account).call()
+        setIncurredDebt(incurredDebt)
+
+        const potentialDebt = await colPay.methods.potentialDebt(account).call()
+        setPotentialDebt(potentialDebt)
+
+      }
+
+      getAccountData()
+
+    }
+
+  }, [account, reload])
+
+  const loadWeb3 = async()=>{
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum)
-      await window.ethereum.enable()
     }
     else if (window.web3) {
       window.web3 = new Web3(window.web3.currentProvider)
@@ -26,89 +111,87 @@ class App extends Component {
     }
   }
 
-  // Loading data from the Blockchain metamask is connected to
-  async loadBlockchainData() {
-    const web3 = window.web3
+  const loadSmartContracts = async()=> {
 
-    // Load account
-    const accounts = await web3.eth.getAccounts()
-    this.setState({account: accounts[0]})
+    const networkId = await window.web3.eth.net.getId()
 
-    // Load Network
-    const networkId = await web3.eth.net.getId()
+    let colPay, cpToken
 
+    // Load CP Tokens
+    try {
+      cpToken = new window.web3.eth.Contract(CPToken.abi, CPToken.networks[networkId].address)
+    } catch (e) {
+      window.alert('CPToken contract not deployed to detected network.')
+      console.error(e)
+    }
     // Load Smart Contract(s)
-    const colPayData = ColPay.networks[networkId]
-    if (colPayData){
-      const abi = ColPay.abi
-      const address = ColPay.networks[networkId].address
-      const colPay = new web3.eth.Contract(abi, address)
-
-      // Store smart contract in state
-      this.setState({ colPay })
-
-      /*
-      // Can also fetch objects inside Blockchain
-      // One Object:
-      let variable = await colPay.methods.aMethod(this.state.account).call()
-      this.setState({ stateVariable: variable.toString() })
-
-      // Several Objects:
-      for (var i= 1; i <= aNumberForMappingLength; i++){
-        const variable = await marketplace.methods.mappingVariable(i).call()
-        this.setState({
-          // adding to array
-          array: [...this.state.array, variable]
-        })
-      }
-      */
-
-    } else {
+    try{
+      colPay = new window.web3.eth.Contract(ColPay.abi, ColPay.networks[networkId].address)
+    } catch(e){
       window.alert('Contract not deployed to detected network.')
+      console.error(e)
     }
-
-    this.setState({loading: false})
+    return [colPay, cpToken]
   }
 
-  constructor(props){
-    super(props)
-    this.state = {
-      // Variables to be used in UI
-      account: '0x0',
-      loading: true,
-      colPay: {}
-    }
+  const createPaymentContract = async (name, totalAmount, recipient, start, expire, daysToOpen, speed, createdBySeller) => {
 
-    // Binding the functions necessary for UI
-    //this.functionName = this.functionName.bind(this)
+    setLoading(true)
+
+    colPay.methods.createPaymentContract(name, totalAmount, recipient, start, expire, daysToOpen, speed, createdBySeller).send({from: account})
+
+    .once('receipt', (receipt) => {
+      setLoading(false)
+      setReload(!reload)
+    })
+
   }
 
-  // Functions go here:
+  const acceptContract = async (id)=>{
+    setLoading(true)
 
-  render() {
-    // Variable to set the content to Main or Loading 
-    let content
-    if(this.state.loading) {
-      content = <p id="loader" className="text-center">Loading...</p>
-    } else {
-      content = <Main/>
-    }
+    colPay.methods.acceptPaymentContract(id).send({from: account})
 
-    return (
-      <div>
-        <Navbar/>
-        <div className="container-fluid mt-5">
-          <div className="row">
-            <main role="main" className="col-lg-12 d-flex text-center">
-              <div className="content mr-auto ml-auto">
-                {content}
-              </div>
-            </main>
-          </div>
+    .once('receipt', (receipt) => {
+      setLoading(false)
+      setReload(!reload)
+    })
+  }
+
+  const rejectContract = async (id)=>{
+    setLoading(true)
+
+    colPay.methods.rejectPaymentContract(id).send({from: account})
+
+    .once('receipt', (receipt) => {
+      setLoading(false)
+      setReload(!reload)
+    })
+  }
+
+  return (
+    <div>
+      <Navbar account={account}/>
+      <div className="container-fluid mt-5">
+        <div className="row">
+          <main role="main" className="col-lg-12 d-flex text-center">
+            <div className="content mr-auto ml-auto">
+              {loading 
+               ? <p id="loader" className="text-center">Loading...</p> 
+               : <Main 
+                      onCreateContract={createPaymentContract}
+                      account={account}
+                      contracts={contracts}
+                      onAccept={acceptContract}
+                      onReject={rejectContract}
+                  />
+              }
+            </div>
+          </main>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default App;
@@ -134,3 +217,19 @@ async function scheduleTransaction() {
 scheduleTransaction();
 
 */
+
+      /*
+      // Can also fetch objects inside Blockchain
+      // One Object:
+      let variable = await colPay.methods.aMethod(this.state.userAddress).call()
+      this.setState({ stateVariable: variable.toString() })
+
+      // Several Objects:
+      for (var i= 1; i <= aNumberForMappingLength; i++){
+        const variable = await marketplace.methods.mappingVariable(i).call()
+        this.setState({
+          // adding to array
+          array: [...this.state.array, variable]
+        })
+      }
+      */
