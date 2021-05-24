@@ -184,6 +184,10 @@ const App = () => {
                       contracts={contracts}
                       onAccept={acceptContract}
                       onReject={rejectContract}
+                      balance={cpTokenBalance}
+                      incurredDebt={incurredDebt}
+                      potentialDebt={potentialDebt}
+                      isBlocked={isBlocked}
                   />
               }
             </div>
