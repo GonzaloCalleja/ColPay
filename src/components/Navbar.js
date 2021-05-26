@@ -49,10 +49,10 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-  }
+  },
 }));
 
-const Navbar = ({account}) => {
+const Navbar = ({account, accountName}) => {
 
   const classes = useStyles()
 
@@ -141,19 +141,30 @@ const Navbar = ({account}) => {
               </div>
             :
               <div className={classes.sectionDesktop}>
-                <Button
-                  className={classNames(classes.navLink, classes.button)}
-                  variant="outlined"
-                  edge="end"
-                  aria-label="account of current user"
-                  aria-controls={menuId}
-                  aria-haspopup="true"
-                  onClick={handleProfileMenuOpen}
-                  color="inherit"
-                  endIcon={<ArrowDropDownIcon/>}
-                >
-                  Gonzalo Calleja
-                </Button>
+                <Tabs value={selectedTab} onChange={handleChange}>
+                <Tab label='Home' className={classes.hide} component={ScrollLink} to="home" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Help & Support' component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Trends' component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}} 
+                  classes={{
+                    wrapper: classes.iconLabelWrapper,
+                    labelContainer: classes.labelContainer
+                  }}/>
+                </Tabs>
+                <div className={classNames(classes.grow, classes.sectionDesktop)}>
+                  <Button
+                    className={classNames(classes.navLink, classes.button)}
+                    variant="outlined"
+                    edge="end"
+                    aria-label="account of current user"
+                    aria-controls={menuId}
+                    aria-haspopup="true"
+                    onClick={handleProfileMenuOpen}
+                    color="inherit"
+                    endIcon={<ArrowDropDownIcon/>}
+                  >
+                    {accountName}
+                  </Button>
+                </div>
               </div>
             }
           </div>
