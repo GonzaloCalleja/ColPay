@@ -10,6 +10,9 @@ const theme = createMuiTheme({
     secondary: {
       main: '#fff',
     },
+    darkBackground: {
+      main: '#333333'
+    }
   },
   mixins: {
     toolbar:{

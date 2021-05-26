@@ -1,10 +1,11 @@
 import React from "react"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { Link as ScrollLink} from "react-scroll";
-import { AppBar, Toolbar, MenuItem, Menu, Link, Button, Tabs, Tab, Collapse, Typography } from "@material-ui/core"
+import { AppBar, Toolbar, MenuItem, Menu, Link, Button, Tabs, Tab, Collapse, Typography, IconButton } from "@material-ui/core"
 import { makeStyles } from '@material-ui/core/styles'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown'
+import MenuIcon from '@material-ui/icons/Menu'
 import classNames from 'classnames'
 
 
@@ -12,6 +13,9 @@ const useStyles = makeStyles((theme) => ({
   toolbar: theme.mixins.toolbar,
   grow: {
     flexGrow: 1,
+  },
+  zIndex: {
+    zIndex: 1300,
   },
   hide: {
     display: 'none',
@@ -50,13 +54,28 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     alignItems: 'flex-start',
   },
+  menuButton: {
+    marginRight: theme.spacing(2),
+    [theme.breakpoints.up("sm")]: {
+      display: "none"
+    }
+  },
 }));
 
-const Navbar = ({account, accountName}) => {
+const Navbar = ({account, accountName, handleDrawerToggle}) => {
 
   const classes = useStyles()
 
   const [anchorEl, setAnchorEl] = useState(null)
+
+  useEffect(() => {
+    const path = window.location.pathname
+    if(path==='/app'){
+      setShowLandingPage(false)
+    }else{
+      setShowLandingPage(true)
+    }
+  }, [])
 
   
   const [showLandingPage, setShowLandingPage] = useState(()=>{
@@ -115,8 +134,17 @@ const Navbar = ({account, accountName}) => {
   return (
     <div className={classes.grow}>
       <div className={classes.toolbar} />
-      <AppBar position='fixed' elevation={0} className="not-scrolled">
-        <Toolbar>
+      <AppBar position='fixed' elevation={0} className={classes.zIndex}>
+        <Toolbar >
+          <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              className={classes.menuButton}
+            >
+              <MenuIcon />
+            </IconButton>
           <Link component={RouterLink} to= '/' variant='h4' color="inherit" className={classes.title} style={{ color: 'inherit', textDecoration: 'inherit'}} onClick={()=>{setSelectedTab(0); setShowLandingPage(!showLandingPage)}}>
             COLPAY
           </Link>

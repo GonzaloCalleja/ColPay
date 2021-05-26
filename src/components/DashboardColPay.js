@@ -1,35 +1,27 @@
+// Library Elements
 import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 import { Typography, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+
+// Smart Contract
 import ColPay from '../abis/ColPay.json'
 import CPToken from '../abis/CPToken.json'
 import Web3 from 'web3'
+
+// Components
 import Main from './Main.js'
+import Drawer from './Drawer.js'
 
-//const { projectId, mnemonic, deployer } = require('../../secrets.json');
-
-// you can pass a theme to useStyles() use theme object. [theme.breakpoints.up("sm")]:{ color: "cyan"} if the breakpoint of small is reached then cyan is color 
-// more than one style -> import classNames library and passin a className object with the classes as arguments
-
-
-//OVERRIDING THEME COLOR??
-const useStyles = makeStyles({
-  /*
-  root: {
-    backgroundColor: '#3a8f69',
-    color: 'white',
-    fontSize: '30px'
-    // conditional statement based on a state variable -> AWESOMEEEE
-    //color: props => props.color,
-  },
-  */
+const useStyles = makeStyles((theme) => ({
   root: {
     display: 'flex',
-  }
-});
+  },
+}))
 
-const ColPayDashboard = ({onLoadAccount}) => {
+const ColPayDashboard = ({onLoadAccount, mobileOpen, handleDrawerToggle}) => {
+
+  const classes = useStyles()
 
   const[colPay, setColPay] = useState({})
   const[cpToken, setCPToken] = useState({})
@@ -204,7 +196,8 @@ const ColPayDashboard = ({onLoadAccount}) => {
   // Expire
 
   return (
-    <div className={useStyles().root}>
+    <div className={classes.root}>
+      <Drawer mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>
       <Grid container direction='column'>
         <Grid item container>
           <Grid item xs={4}/>
