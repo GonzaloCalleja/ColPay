@@ -29,7 +29,7 @@ const useStyles = makeStyles({
   }
 });
 
-const ColPayDashboard = () => {
+const ColPayDashboard = ({onLoadAccount}) => {
 
   const[colPay, setColPay] = useState({})
   const[cpToken, setCPToken] = useState({})
@@ -59,6 +59,7 @@ const ColPayDashboard = () => {
 
       const accounts = await window.web3.eth.getAccounts()
       setAccount(accounts[0])
+      onLoadAccount(accounts[0])
     }
 
     getBlockChainData()
@@ -72,7 +73,7 @@ const ColPayDashboard = () => {
 
       const getAccountData = async () =>{
 
-        console.log("trigger")
+        //console.log("trigger")
 
         const cpTokenBalance = await cpToken.methods.balanceOf(account).call()
         setCPTokenBalance(cpTokenBalance)
@@ -206,7 +207,7 @@ const ColPayDashboard = () => {
     <div className={useStyles().root}>
       <Grid container direction='column'>
         <Grid item container>
-          <Grid xs={4}/>
+          <Grid item xs={4}/>
           <Grid>
             {loading 
             ? <Typography>Loading...</Typography> 
@@ -224,10 +225,7 @@ const ColPayDashboard = () => {
               />
             }
           </Grid>
-          <Grid xs={4}/>
-        </Grid>
-        <Grid item>
-          Footer
+          <Grid item xs={4}/>
         </Grid>
       </Grid>
     </div>
