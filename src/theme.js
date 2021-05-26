@@ -5,14 +5,12 @@ import green from '@material-ui/core/colors/green';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#3a8f69',
+      main: '#3a8f69'
     },
     secondary: {
       main: '#fff',
     },
-    darkBackground: {
-      main: '#333333'
-    }
+
   },
   mixins: {
     toolbar:{

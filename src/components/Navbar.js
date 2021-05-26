@@ -20,6 +20,12 @@ const useStyles = makeStyles((theme) => ({
   hide: {
     display: 'none',
   },
+  tabs: {
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'inline-flex',
+    },
+  },
   title: {
     display: 'none',
     [theme.breakpoints.up('sm')]: {
@@ -40,11 +46,8 @@ const useStyles = makeStyles((theme) => ({
   navLink: {
     textAlign: 'center',
     marginRight: theme.spacing(4),
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      minWidth: '100px',
-      display: 'block'
-    }
+    minWidth: '100px',
+    display: 'block'
   },
   button: {
     display: 'flex',
@@ -62,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Navbar = ({account, accountName, handleDrawerToggle}) => {
+const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
 
   const classes = useStyles()
 
@@ -70,17 +73,17 @@ const Navbar = ({account, accountName, handleDrawerToggle}) => {
 
   useEffect(() => {
     const path = window.location.pathname
-    if(path==='/app'){
-      setShowLandingPage(false)
-    }else{
+    if(path===paths[0].home){
       setShowLandingPage(true)
+    }else{
+      setShowLandingPage(false)
     }
   }, [])
 
   
   const [showLandingPage, setShowLandingPage] = useState(()=>{
     const path = window.location.pathname
-    if(path==='/app'){
+    if(path===paths[0].appMain){
       return false
     }else{
       return true
@@ -126,8 +129,8 @@ const Navbar = ({account, accountName, handleDrawerToggle}) => {
         <Typography variant='caption'>ColPay ID</Typography>
         <Typography variant='overline'>{account}</Typography>
         </MenuItem>
-      <MenuItem onClick={handleMenuClose}>My Profile</MenuItem>
-      <MenuItem component={RouterLink} to= '/' onClick={handleLogOut}>Logout</MenuItem>
+      <MenuItem component={RouterLink} to= {paths[0].appMyProfile} onClick={handleMenuClose}>My Profile</MenuItem>
+      <MenuItem component={RouterLink} to= {paths[0].home} onClick={handleLogOut}>Logout</MenuItem>
     </Menu>
   );
 
@@ -145,7 +148,7 @@ const Navbar = ({account, accountName, handleDrawerToggle}) => {
             >
               <MenuIcon />
             </IconButton>
-          <Link component={RouterLink} to= '/' variant='h4' color="inherit" className={classes.title} style={{ color: 'inherit', textDecoration: 'inherit'}} onClick={()=>{setSelectedTab(0); setShowLandingPage(!showLandingPage)}}>
+          <Link component={RouterLink} to= {paths[0].home} variant='h4' color="inherit" className={classes.title} style={{ color: 'inherit', textDecoration: 'inherit'}} onClick={()=>{setSelectedTab(0);setShowLandingPage(true)}}>
             COLPAY
           </Link>
           <div className={classes.grow}>
@@ -154,15 +157,15 @@ const Navbar = ({account, accountName, handleDrawerToggle}) => {
               <div className={classes.sectionDesktop}>
                 <Tabs value={selectedTab} onChange={handleChange}>
                   <Tab label='Home' className={classes.hide} component={ScrollLink} to="home" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='About' component={ScrollLink} to="about" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='Services' component={ScrollLink} to="services" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='Contact' component={ScrollLink} to="contact" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='About' className={classes.tabs} component={ScrollLink} to="about" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Services' className={classes.tabs} component={ScrollLink} to="services" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Contact' className={classes.tabs} component={ScrollLink} to="contact" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                 </Tabs>
                 <div className={classNames(classes.grow, classes.sectionDesktop)}>
-                  <Button component={RouterLink} to='/app'  size='large' color="inherit" variant="outlined" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
+                  <Button component={RouterLink} to={paths[0].appMain}  size='large' color="inherit" variant="outlined" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
                     Log In
                   </Button>
-                  <Button component={RouterLink} to='/app'  size='large' color="secondary" variant="contained" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
+                  <Button component={RouterLink} to={paths[0].appMain}  size='large' color="secondary" variant="contained" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
                     Sign Up
                   </Button>
                 </div>
@@ -171,8 +174,8 @@ const Navbar = ({account, accountName, handleDrawerToggle}) => {
               <div className={classes.sectionDesktop}>
                 <Tabs value={selectedTab} onChange={handleChange}>
                 <Tab label='Home' className={classes.hide} component={ScrollLink} to="home" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='Help & Support' component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='Trends' component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}} 
+                  <Tab label='Help & Support' className={classes.tabs} component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Trends' className={classes.tabs} component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}} 
                   classes={{
                     wrapper: classes.iconLabelWrapper,
                     labelContainer: classes.labelContainer
@@ -182,6 +185,7 @@ const Navbar = ({account, accountName, handleDrawerToggle}) => {
                   <Button
                     className={classNames(classes.navLink, classes.button)}
                     variant="outlined"
+                    size='medium'
                     edge="end"
                     aria-label="account of current user"
                     aria-controls={menuId}

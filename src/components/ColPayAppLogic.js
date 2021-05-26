@@ -1,6 +1,6 @@
 // Library Elements
 import { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, useRouteMatch } from 'react-router-dom'
 import { Typography, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -12,6 +12,7 @@ import Web3 from 'web3'
 // Components
 import Main from './Main.js'
 import Drawer from './Drawer.js'
+import MyAccount from './MyAccount.js'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ColPayDashboard = ({onLoadAccount, mobileOpen, handleDrawerToggle}) => {
+const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle}) => {
 
   const classes = useStyles()
 
@@ -193,34 +194,48 @@ const ColPayDashboard = ({onLoadAccount, mobileOpen, handleDrawerToggle}) => {
     })
   }
 
-  // Expire
-
   return (
     <div className={classes.root}>
-      <Drawer mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>
-      <Grid container direction='column'>
-        <Grid item container>
-          <Grid item xs={4}/>
-          <Grid>
-            {loading 
-            ? <Typography>Loading...</Typography> 
-            : <Main 
-                  onCreateContract={createPaymentContract}
-                  account={account}
-                  contracts={contracts}
-                  onAccept={acceptContract}
-                  onReject={rejectContract}
-                  balance={cpTokenBalance}
-                  incurredDebt={incurredDebt}
-                  potentialDebt={potentialDebt}
-                  isBlocked={isBlocked}
-                  onTransaction={makeTransaction}
-              />
-            }
-          </Grid>
-          <Grid item xs={4}/>
-        </Grid>
-      </Grid>
+      
+      <Drawer mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} paths={paths}/>
+
+      <Switch>
+        <Route exact path={paths[0].appMyAccount}>
+          <MyAccount 
+            account={account} 
+            contracts={contracts} 
+            balance={cpTokenBalance} 
+            isBlocked={isBlocked} 
+            incurredDebt={incurredDebt} 
+            potentialDebt={potentialDebt}
+          />
+        </Route>
+
+      {/* ADD ALL MENU COMPONENTS HEREE */}
+
+      <Route path={paths[0].appMore} exact component={()=>
+        {
+          if(loading){
+            return(<Typography>Loading...</Typography>)
+          }
+          else {
+            return(
+              <Main 
+              onCreateContract={createPaymentContract}
+              account={account}
+              contracts={contracts}
+              onAccept={acceptContract}
+              onReject={rejectContract}
+              balance={cpTokenBalance}
+              incurredDebt={incurredDebt}
+              potentialDebt={potentialDebt}
+              isBlocked={isBlocked}
+              onTransaction={makeTransaction}
+            />
+            )
+          }
+        }} /> 
+      </Switch>
     </div>
   );
 }

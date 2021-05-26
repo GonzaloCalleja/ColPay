@@ -1,11 +1,11 @@
 // Library Elements
 import { useState } from 'react'
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-dom'
 import { CssBaseline } from '@material-ui/core'
 
 // Components
 import LandingPage from './LandingPage.js'
-import DashboardColPay from './DashboardColPay.js'
+import ColPayAppLogic from './ColPayAppLogic.js'
 import Navbar from './Navbar.js'
 import Footer from './Footer.js'
 
@@ -14,11 +14,23 @@ const App = () => {
     const [account, setAccount] = useState('0x0')
     const [accountName, setAccountName] = useState('')
 
-    const paths = [
-        '/',
-        '/app'
-    ]
 
+    const paths = useState(
+        {
+        home: '/',
+        appMain: '/app',
+        appMyProfile: '/app/my-profile',
+        appMyAccount: '/app/my-account',
+        appCreateContract: '/app/create-contract',
+        appReviewContract: '/app/review-contract',
+        appUpload: '/app/upload-invoice',
+        appRequest: '/app/request-payment',
+        appRecurring: '/app/recurring-transaction',
+        appTransactions: '/app/transactions',
+        appDocuments: '/app/documents',
+        appMore: '/app/more'
+        }
+    )
     // This information would live in ColPays backend and be secured in normal application.
     const AccountsToName = {
         '0x60E497A5d341C41C831B3A3929ac096003418563': 'ColPay Admin',
@@ -42,18 +54,20 @@ const App = () => {
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
-
+    
     return (
         <div>
             <CssBaseline />
             <Router>
-                <Navbar account={account} accountName={accountName} handleDrawerToggle={handleDrawerToggle}/>
+                <Navbar account={account} accountName={accountName} handleDrawerToggle={handleDrawerToggle} paths={paths}/>
                 <div>
-                    { (!paths.includes(window.location.pathname)) && <Route render={()=>(<Redirect to='/'/>)} /> }
-                    <Route path='/' exact component={LandingPage} /> 
-                    <Route path='/app' exact component={()=>{return(<DashboardColPay onLoadAccount={onLoadAccount} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>)}} />
+                    { !Object.values(paths[0]).includes(window.location.pathname) && <Route render={()=>(<Redirect to={paths[0].home}/>)} /> }
+                    <Switch>
+                        <Route path={paths[0].home} exact component={LandingPage} /> 
+                        <Route path={paths[0].appMain} component={()=>{return(<ColPayAppLogic paths={paths} onLoadAccount={onLoadAccount} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>)}} />
+                    </Switch>
                 </div>
-                <Footer/>
+                <Footer paths={paths}/>
             </Router>
         </div>
     )
