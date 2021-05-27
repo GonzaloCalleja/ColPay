@@ -1,6 +1,6 @@
 // Library Elements
 import { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Switch, useRouteMatch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
 import { Typography, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle}) => {
+const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, AccountsToName}) => {
 
   const classes = useStyles()
 
@@ -35,8 +35,31 @@ const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle})
   const[incurredDebt, setIncurredDebt] = useState(0)
   const[potentialDebt, setPotentialDebt] = useState(0)
 
+  const[balanceEther, setBalanceEther] = useState(0)
+  const[incurredDebtEther, setIncurredDebtEther] = useState(0)
+  const [potentialDebtEther, setPotentailDebtEther] = useState(0)
+
   const[loading, setLoading] = useState(true)
   const[reload, setReload] = useState(true)
+
+  const statusValues = useState(
+    {
+      NotReviewed: 'Not Reviewed', 
+      Rejected: 'Rejected', 
+      Accepted: 'Accepted', 
+      Fulfilled: 'Fulfilled', 
+      MissingPayments: 'Missing Payment'
+    }
+    )
+
+    const statusEnumValues =
+      {
+        0: 'Not Reviewed', 
+        1: 'Rejected', 
+        2: 'Accepted', 
+        3: 'Fulfilled', 
+        4: 'Missing Payment'
+      }
 
 
   // Function called every render. Or whenever change in a value of the array
@@ -70,7 +93,7 @@ const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle})
 
         const cpTokenBalance = await cpToken.methods.balanceOf(account).call()
         setCPTokenBalance(cpTokenBalance)
-  
+        setBalanceEther(Math.round(window.web3.utils.fromWei(cpTokenBalance.toString(), 'Ether') * 100)/100)  
         
         const contractCount = await colPay.methods.getContractNumber(account).call()
         //setContractCount(contractCount)
@@ -80,16 +103,50 @@ const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle})
         for(let id = 0; id < contractCount; id++){
           const contractID = await colPay.methods.paymentContractsHeldPerAddress(account, id).call()
           const contract = await colPay.methods.paymentContracts(contractID).call()
+
+          contract.totalEther = Math.round(window.web3.utils.fromWei(contract.totalAmount.toString(), 'Ether') * 100)/100
+          contract.paidEther = Math.round(window.web3.utils.fromWei(contract.amountPaid.toString(), 'Ether') *100)/100
+
+          const status = statusEnumValues[contract.status]
+          contract.statusName = status
+
+          const start = new Date(contract.startDate*1000)
+          const startMonth = start.getMonth() +1
+          const startDate = start.getDate() + '/' + startMonth +  '/' + start.getFullYear()
+          contract.startDateFormat = startDate
+          
+          const expires = new Date(contract.expiryDate*1000)
+          const endMonth = expires.getMonth() +1
+          const expiryDate = expires.getDate() + '/' + endMonth +  '/' + expires.getFullYear()
+          contract.expiryDateFormat = expiryDate
           
           const transactionsCount = await colPay.methods.getTransactionNumber(contractID).call()
           const transactions = []
 
           for (let key = 0; key < transactionsCount; key++){
             const contractTransactions = await colPay.methods.transactionLists(contractID, key).call()
+            const date = new Date(contractTransactions.date*1000)
+            const dateMonth = date.getMonth() +1
+            const dateFormat = date.getDate() + '/' + dateMonth +  '/' + date.getFullYear()
+
+            contractTransactions.dateFormat = dateFormat
+            contractTransactions.valueEther = window.web3.utils.fromWei(contractTransactions.value.toString(), 'Ether')
+
             transactions.push(contractTransactions)
           }
-          
           contract.transactions = transactions
+
+          let recipient, recipientName
+          if (contracts.seller === account){
+            recipient = contract.buyer
+            recipientName = AccountsToName[0][contract.buyer]
+          }else {
+            recipient = contract.seller
+            recipientName = AccountsToName[0][contract.seller] 
+          }
+
+          contract.recipient = recipient
+          contract.recipientName = recipientName
 
           contractsToUpdate.push(contract)
         }
@@ -101,9 +158,11 @@ const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle})
 
         const incurredDebt = await colPay.methods.incurredDebt(account).call()
         setIncurredDebt(incurredDebt)
+        setIncurredDebtEther(Math.round(window.web3.utils.fromWei(incurredDebt.toString(), 'Ether')*100)/100)
 
         const potentialDebt = await colPay.methods.potentialDebt(account).call()
         setPotentialDebt(potentialDebt)
+        setPotentailDebtEther(Math.round(window.web3.utils.fromWei(potentialDebt.toString(), 'Ether')*100)/100)
 
       }
 
@@ -200,18 +259,25 @@ const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle})
       <Drawer mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle} paths={paths}/>
 
       <Switch>
+      { paths[0].appMain === window.location.pathname && <Route render={()=>(<Redirect to={paths[0].appMyAccount}/>)} /> }
         <Route exact path={paths[0].appMyAccount}>
           <MyAccount 
             account={account} 
             contracts={contracts} 
-            balance={cpTokenBalance} 
+            balance={balanceEther} 
             isBlocked={isBlocked} 
-            incurredDebt={incurredDebt} 
-            potentialDebt={potentialDebt}
+            incurredDebt={incurredDebtEther} 
+            potentialDebt={potentialDebtEther}
+            statusValues={statusValues}
+            paths={paths}
           />
         </Route>
 
       {/* ADD ALL MENU COMPONENTS HEREE */}
+
+      <Route exact path={paths[0].appCreateContract}>
+        <h1>Hello</h1>
+      </Route>
 
       <Route path={paths[0].appMore} exact component={()=>
         {
@@ -240,7 +306,7 @@ const ColPayDashboard = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle})
   );
 }
 
-export default ColPayDashboard;
+export default ColPayAppLogic;
 
 /*
 Code for daily execution

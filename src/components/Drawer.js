@@ -13,7 +13,6 @@ import SyncAltOutlinedIcon from '@material-ui/icons/SyncAltOutlined'
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined'
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined'
 import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined'
-import { BorderLeftOutlined } from '@material-ui/icons'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -43,6 +42,10 @@ const useStyles = makeStyles((theme) => ({
       background: '#35353E',
       borderLeft: "5px solid #c3ddd2"
     },
+  },
+  selected: {
+    background: '#35353E',
+    borderLeft: "5px solid #c3ddd2"
   },
   accountText:{
     color: '#fff',
@@ -75,6 +78,17 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
   
   const container = window !== undefined ? () => window().document.body : undefined
 
+  const [accountSelected, setAccountSelected] = useState(true)
+  const [createContractSelected, setCreateContractSelected] = useState(false)
+  const [reviewSelected, setReviewSelectedSelected] = useState(false)
+  const [uploadSelected, setUploadSelectedSelected] = useState(false)
+  const [requestPaymentSelected, setRequestPaymentSelected] = useState(false)
+  const [recurrentTransactionSelected, setRecurrentTransactionSelected] = useState(false)
+  const [transactionOverviewSelected, setTransactionOverviewSelected] = useState(false)
+  const [recipientsSelected, setRecipientsSelected] = useState(false)
+  const [myDocumentsSelected, setMyDocumentsSelected] = useState(false)
+  const [moreSelected, setMoreSelected] = useState(false)
+
   const itemsList = [
     {
       text: 'MY ACCOUNT',
@@ -82,7 +96,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appMyAccount)
+      state: accountSelected,
+      onClick: () =>  {
+        history.push(paths[0].appMain)
+        setAccountSelected(true)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'CONTRACTS',
@@ -90,7 +117,6 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: <ListItemIcon className={classes.drawerIcon}><DescriptionOutlinedIcon /></ListItemIcon>,
       spacing: <div className={classes.spacing} />,
       button: false,
-      onClick: null
     },
     {
       text: 'Create a Contract',
@@ -98,7 +124,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appCreateContract)
+      state: createContractSelected,
+      onClick: () => {
+        history.push(paths[0].appCreateContract)
+        setAccountSelected(false)
+        setCreateContractSelected(true)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'Review a Contract',
@@ -106,7 +145,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appReviewContract)
+      state: reviewSelected,
+      onClick: () => {
+        history.push(paths[0].appReviewContract)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(true)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'TRANSACTIONS',
@@ -114,7 +166,6 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: <ListItemIcon className={classes.drawerIcon}><SyncAltOutlinedIcon /></ListItemIcon>,
       spacing: <div className={classes.spacing} />,
       button: false,
-      onClick: null
     },
     {
       text: 'Upload an Invoice',
@@ -122,7 +173,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appUpload)
+      state: uploadSelected,
+      onClick: () => {
+        history.push(paths[0].appUpload)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(true)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'Request a Payment',
@@ -130,7 +194,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appRequest)
+      state: requestPaymentSelected,
+      onClick: () => {
+        history.push(paths[0].appRequest)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(true)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'Recurring Transaction',
@@ -138,7 +215,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appRecurring)
+      state: recurrentTransactionSelected,
+      onClick: () => {
+        history.push(paths[0].appRecurring)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(true)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'MY INFO',
@@ -146,7 +236,6 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: <ListItemIcon className={classes.drawerIcon}><AccountCircleOutlinedIcon /></ListItemIcon>,
       spacing: <div className={classes.spacing} />,
       button: false,
-      onClick: null
     },
     {
       text: 'Transactions Overview',
@@ -154,7 +243,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appTransactions)
+      state: transactionOverviewSelected,
+      onClick: () => {
+        history.push(paths[0].appTransactions)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(true)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'Recipients',
@@ -162,7 +264,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appTransactions)
+      state: recipientsSelected,
+      onClick: () => {
+        history.push(paths[0].appTransactions)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(true)
+        setMyDocumentsSelected(false)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'My Documents',
@@ -170,7 +285,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appDocuments)
+      state: myDocumentsSelected,
+      onClick: () => {
+        history.push(paths[0].appDocuments)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(true)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'MORE',
@@ -178,7 +306,6 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: <ListItemIcon className={classes.drawerIcon}><MoreHorizOutlinedIcon /></ListItemIcon>,
       spacing: <div className={classes.spacing} />,
       button: false,
-      onClick: null
     },
     {
       text: 'Payment Timings & Fees',
@@ -186,7 +313,20 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: null,
       spacing: null,
       button: true,
-      onClick: () => history.push(paths[0].appMore)
+      state: moreSelected,
+      onClick: () => {
+        history.push(paths[0].appMore)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setMyDocumentsSelected(false)
+        setMoreSelected(true)
+      }
     },
   ]
 
@@ -196,16 +336,15 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       <div className={classes.spacing} />
       <List>
         {itemsList.map((item, index) => { 
-          const {text, className, icon, spacing, button, onClick} = item
           return(
-            <div>
-            {spacing}
-            {button 
-              ? <ListItem className={classes.hoverList} dense button={button} onClick={onClick}>
-                <ListItemText className={className} primary={text}/> 
+            <div key ={index}>
+            {item.spacing}
+            {item.button 
+              ? <ListItem className={ item.state ? classes.selected : classes.hoverList } dense button={item.button} onClick={item.onClick}>
+                <ListItemText className={item.className} primary={item.text}/> 
                 </ListItem>
-              : <ListItem dense> {icon}
-                <ListItemText className={className} primary={text}/> 
+              : <ListItem dense> {item.icon}
+                <ListItemText className={item.className} primary={item.text}/> 
                 </ListItem>
             }          
             </div>
