@@ -27,6 +27,10 @@ const useRowStyles = makeStyles({
     '&:hover': {
       background: '#993F3A',
     },
+  },
+  columntile: {
+    display: 'flex',
+    flexDirection: 'column'
   }
 });
 
@@ -74,35 +78,33 @@ function Row(props) {
         <StyledTableCell align="left">{ row.partnerName}</StyledTableCell>
         <StyledTableCell align="left">{row.startDateFormat}</StyledTableCell>
         <StyledTableCell align="left">{row.expiryDateFormat}</StyledTableCell>
-        <StyledTableCell align="center">{row.speed}</StyledTableCell>
+        <StyledTableCell align="center">{row.speed} %</StyledTableCell>
         <StyledTableCell align="left">{row.statusName.toString()}</StyledTableCell>
         <StyledTableCell align="center">{row.daysToOpen}</StyledTableCell>
         {(reviewTable && account === row.recipient)
         ?
           <StyledTableCell align="center">
-            <Button 
-              variant="contained" 
-              color="primary" 
-              size='small'
-              id = {row.id}
-              onClick={(event) => {
-                onAccept(event.target.id)
-              } }
-              >
-              Accept
-            </Button>
-            <Button 
-              className={classes.reject}
-              variant="contained" 
-              color="primary" 
-              id = {row.id}
-              size='small'
-              onClick={(event) => {
-                onReject(event.target.id)
-              } }
-              >
-              Reject
-            </Button>
+            <div className={classes.columntile}>
+              <Button 
+                variant="contained" 
+                color="primary" 
+                size='small'
+                id = {row.id.toString()}
+                onClick={() => { onAccept(row.id.toString())  } }
+                >
+                Accept
+              </Button>
+              <Button 
+                className={classes.reject}
+                variant="contained" 
+                color="primary" 
+                id = {row.id.toString()}
+                size='small'
+                onClick={() => { onReject(row.id.toString()) } }
+                >
+                Reject
+              </Button>
+            </div>
           </StyledTableCell>
           : [
             reviewTable

@@ -14,7 +14,8 @@ import Main from '../Main.js'
 import Drawer from './Drawer.js'
 import MyAccount from './MyAccount.js'
 import ContractsOverview from './ContractsOverview.js'
-import ReviewContract from './ReviewContract.js'
+import ContractsReview from './ContractsReview.js'
+import ContractCreate from './ContractCreate.js'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -90,7 +91,7 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
 
     if(account){
 
-      const getAccountData = async () =>{
+      let getAccountData = async () =>{
 
         //console.log("trigger")
 
@@ -288,28 +289,47 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
           />
         </Route>
 
-        <Route exact path={paths[0].appReviewContract}>
-          <ReviewContract 
-            contracts={contracts} 
-            statusValues={statusValues}
-            account = {account}
-            onAccept = {acceptContract}
-            onReject = {rejectContract}
-          />
-        </Route>
+        <Route exact path={paths[0].appReviewContract} component={()=>{
+          if (loading){
+            return (<Typography variant='h2'>Loading...</Typography>)
+          }else {
+            return (
+              <ContractsReview 
+                contracts={contracts} 
+                statusValues={statusValues}
+                account = {account}
+                onAccept = {acceptContract}
+                onReject = {rejectContract}
+                isBlocked={isBlocked}
+              />
+            )
+          }
+        }} /> 
+
+        <Route exact path={paths[0].appCreateContract} component={()=>{
+          if (loading){
+            return (<Typography variant='h2'>Loading...</Typography>)
+          }else {
+            return (
+              <ContractCreate 
+              onCreateContract={createPaymentContract} 
+              isBlocked={isBlocked}
+              AccountsToName={AccountsToName}
+              account={account}
+              />
+            )
+          }
+        }} /> 
 
         <Route exact path={paths[0].appContractsOverview}>
-          <ContractsOverview 
-            contracts={contracts} 
-            statusValues={statusValues}
-          />
-        </Route>
+             <ContractsOverview
+                contracts={contracts} 
+                statusValues={statusValues}
+              />
+        </Route> 
+
 
       {/* ADD ALL MENU COMPONENTS HEREE */}
-
-      <Route exact path={paths[0].appCreateContract}>
-        <h1>Hello</h1>
-      </Route>
 
       <Route path={paths[0].appMore} exact component={()=>
         {

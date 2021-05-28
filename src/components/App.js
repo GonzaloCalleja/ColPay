@@ -8,6 +8,7 @@ import LandingPage from './mainComponents/LandingPage.js'
 import ColPayAppLogic from './mainComponents/ColPayAppLogic.js'
 import Navbar from './mainComponents/Navbar.js'
 import Footer from './mainComponents/Footer.js'
+import ScrollToTop from './smallComponents/ScrollToTop.js'
 
 const App = () => {
 
@@ -59,6 +60,7 @@ const App = () => {
         <div>
             <CssBaseline />
             <Router>
+                <ScrollToTop />
                 <Navbar account={account} accountName={accountName} handleDrawerToggle={handleDrawerToggle} paths={paths}/>
                 <div>
                     { !Object.values(paths[0]).includes(window.location.pathname) && <Route render={()=>(<Redirect to={paths[0].home}/>)} /> }
