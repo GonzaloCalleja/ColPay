@@ -4,10 +4,10 @@ import { BrowserRouter as Router, Route, Redirect, Switch } from 'react-router-d
 import { CssBaseline } from '@material-ui/core'
 
 // Components
-import LandingPage from './LandingPage.js'
-import ColPayAppLogic from './ColPayAppLogic.js'
-import Navbar from './Navbar.js'
-import Footer from './Footer.js'
+import LandingPage from './mainComponents/LandingPage.js'
+import ColPayAppLogic from './mainComponents/ColPayAppLogic.js'
+import Navbar from './mainComponents/Navbar.js'
+import Footer from './mainComponents/Footer.js'
 
 const App = () => {
 
@@ -26,8 +26,8 @@ const App = () => {
         appUpload: '/app/upload-invoice',
         appRequest: '/app/request-payment',
         appRecurring: '/app/recurring-transaction',
-        appTransactions: '/app/transactions',
-        appDocuments: '/app/documents',
+        appTransactions: '/app/all-transactions',
+        appContractsOverview: '/app/all-conracts',
         appMore: '/app/more'
         }
     )

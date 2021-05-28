@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import Box from '@material-ui/core/Box';
 import Collapse from '@material-ui/core/Collapse';
@@ -42,18 +41,22 @@ const StyledTableCell = withStyles((theme) => ({
   }))(TableRow);
 
 function Row(props) {
-  const { row } = props;
+  const { row, allStatusValues } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
 
   return (
     <React.Fragment>
       <StyledTableRow className={classes.root}>
-        <StyledTableCell>
-          <IconButton size="small" onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </StyledTableCell>
+          <StyledTableCell>
+          {
+            (allStatusValues[0].NotReviewed !== row.statusName && allStatusValues[0].Rejected !== row.statusName )
+            &&
+            <IconButton size="small" onClick={() => setOpen(!open)}>
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          }
+          </StyledTableCell>
         <StyledTableCell align="right">
         {row.id.toString()}
         </StyledTableCell>
@@ -66,7 +69,11 @@ function Row(props) {
         <StyledTableCell align="center">{row.speed}</StyledTableCell>
         <StyledTableCell align="left">{row.statusName.toString()}</StyledTableCell>
         <StyledTableCell align="center">{row.daysToOpen}</StyledTableCell>
+        
       </StyledTableRow>
+      {
+        (allStatusValues[0].NotReviewed !== row.statusName && allStatusValues[0].Rejected !== row.statusName )
+         &&
       <StyledTableRow>
         <StyledTableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={12}>
           <Collapse in={open} timeout="auto" unmountOnExit>
@@ -113,11 +120,12 @@ function Row(props) {
           </Collapse>
         </StyledTableCell>
       </StyledTableRow>
+            }
     </React.Fragment>
   );
 }
 
-const ContractsAndTransactionsTable =({ contracts, statusValues }) => {
+const ContractsAndTransactionsTable =({ contracts, statusValues, allStatusValues }) => {
 
   return (
     <TableContainer component={Paper}>
@@ -135,12 +143,13 @@ const ContractsAndTransactionsTable =({ contracts, statusValues }) => {
             <StyledTableCell align="center">SPEED</StyledTableCell>
             <StyledTableCell align="left">STATUS</StyledTableCell>
             <StyledTableCell align="left">DAYS LOCKED</StyledTableCell>
+
           </StyledTableRow>
         </TableHead>
         <TableBody>
           {contracts.map((contract) => {
-            if(contract.statusName === statusValues[0].Accepted){
-              return <Row key={contract.id.toString()} row={contract} />
+            if( statusValues.includes(contract.statusName)){
+              return <Row key={contract.id.toString()} row={contract} allStatusValues={allStatusValues} />
             }
             })}
         </TableBody>

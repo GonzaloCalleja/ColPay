@@ -86,7 +86,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
   const [recurrentTransactionSelected, setRecurrentTransactionSelected] = useState(false)
   const [transactionOverviewSelected, setTransactionOverviewSelected] = useState(false)
   const [recipientsSelected, setRecipientsSelected] = useState(false)
-  const [myDocumentsSelected, setMyDocumentsSelected] = useState(false)
+  const [contractsOverviewSelected, setContractsOverviewSelected] = useState(false)
   const [moreSelected, setMoreSelected] = useState(false)
 
   const itemsList = [
@@ -107,7 +107,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -135,7 +135,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -156,7 +156,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -184,7 +184,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -205,7 +205,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -226,7 +226,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(true)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -236,6 +236,28 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       icon: <ListItemIcon className={classes.drawerIcon}><AccountCircleOutlinedIcon /></ListItemIcon>,
       spacing: <div className={classes.spacing} />,
       button: false,
+    },
+
+    {
+      text: 'Contracts Overview',
+      className: classes.drawerText,
+      icon: null,
+      spacing: null,
+      button: true,
+      state: contractsOverviewSelected,
+      onClick: () => {
+        history.push(paths[0].appContractsOverview)
+        setAccountSelected(false)
+        setCreateContractSelected(false)
+        setReviewSelectedSelected(false)
+        setUploadSelectedSelected(false)
+        setRequestPaymentSelected(false)
+        setRecurrentTransactionSelected(false)
+        setTransactionOverviewSelected(false)
+        setRecipientsSelected(false)
+        setContractsOverviewSelected(true)
+        setMoreSelected(false)
+      }
     },
     {
       text: 'Transactions Overview',
@@ -254,7 +276,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(true)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -275,28 +297,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(true)
-        setMyDocumentsSelected(false)
-        setMoreSelected(false)
-      }
-    },
-    {
-      text: 'My Documents',
-      className: classes.drawerText,
-      icon: null,
-      spacing: null,
-      button: true,
-      state: myDocumentsSelected,
-      onClick: () => {
-        history.push(paths[0].appDocuments)
-        setAccountSelected(false)
-        setCreateContractSelected(false)
-        setReviewSelectedSelected(false)
-        setUploadSelectedSelected(false)
-        setRequestPaymentSelected(false)
-        setRecurrentTransactionSelected(false)
-        setTransactionOverviewSelected(false)
-        setRecipientsSelected(false)
-        setMyDocumentsSelected(true)
+        setContractsOverviewSelected(false)
         setMoreSelected(false)
       }
     },
@@ -324,7 +325,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setRecurrentTransactionSelected(false)
         setTransactionOverviewSelected(false)
         setRecipientsSelected(false)
-        setMyDocumentsSelected(false)
+        setContractsOverviewSelected(false)
         setMoreSelected(true)
       }
     },

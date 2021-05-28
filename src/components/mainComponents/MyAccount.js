@@ -2,9 +2,10 @@ import { Grid, Typography, Divider } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Link as RouterLink, useHistory } from 'react-router-dom'
 
-import SingleFieldCard from './SingleFieldCard'
-import TwoFieldCard from './TwoFieldCard'
-import ContractsAndTransactionsTable from './ContractsAndTransactionsTable'
+import Title from '../smallComponents/Title'
+import SingleFieldCard from '../smallComponents/SingleFieldCard'
+import TwoFieldCard from '../smallComponents/TwoFieldCard'
+import ContractsAndTransactionsTable from '../smallComponents/ContractsAndTransactionsTable'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -13,9 +14,6 @@ const useStyles = makeStyles((theme) => ({
     mainGrid: {
         flexGrow: 1,
         marginTop: '50px'
-    },
-    divider:{
-        marginBottom: '15px'
     },
     subtitle:{
         marginTop: '5px',
@@ -58,13 +56,7 @@ const MyAccount = ({ contracts, balance, isBlocked, incurredDebt, potentialDebt,
     return (
         <div className={classes.root}>
             <Grid container direction='column' className={classes.mainGrid} spacing={2}>
-                <Grid container>
-                    <Grid item sm={false} md={1}/>
-                    <Grid item sm={10}>
-                        <Typography variant='h4' gutterBottom>My Account</Typography>
-                        <Divider className={classes.divider}/>
-                    </Grid>
-                </Grid>
+                <Title title={'My Account'}/>
                 <Grid item sm={12} md={12} container>
                     <Grid item sm={false} md={1}/>
                     <Grid item sm={12} md={10} container spacing={3}>
@@ -86,17 +78,15 @@ const MyAccount = ({ contracts, balance, isBlocked, incurredDebt, potentialDebt,
                         </Typography>
                     </Grid>
                 </Grid>
-                {
-                    contracts.length > 0
-                    ?
                     <Grid item sm={12} md={12} container>
                         <Grid item sm={false} md={1}/>
-                        <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={statusValues}/></Grid>
+                        {
+                            contracts.length > 0
+                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={[statusValues[0].Accepted ]} allStatusValues={statusValues}/></Grid>
+                            : <Typography variant='h6'>No Active Contracts to Show</Typography>
+                        }
                         <Grid item sm={false} md={1}/>
                     </Grid>
-                    :
-                    <p className="text-center">No Contracts to Show</p>
-                }
                 </Grid>
         </div>
     )

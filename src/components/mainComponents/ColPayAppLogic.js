@@ -5,14 +5,17 @@ import { Typography, Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 // Smart Contract
-import ColPay from '../abis/ColPay.json'
-import CPToken from '../abis/CPToken.json'
+import ColPay from '../../abis/ColPay.json'
+import CPToken from '../../abis/CPToken.json'
 import Web3 from 'web3'
 
 // Components
-import Main from './Main.js'
+import Main from '../Main.js'
 import Drawer from './Drawer.js'
 import MyAccount from './MyAccount.js'
+import ContractsOverview from './ContractsOverview.js'
+import ReviewContract from './ReviewContract.js'
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -270,6 +273,23 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
             potentialDebt={potentialDebtEther}
             statusValues={statusValues}
             paths={paths}
+          />
+        </Route>
+
+        <Route exact path={paths[0].appReviewContract}>
+          <ReviewContract 
+            contracts={contracts} 
+            statusValues={statusValues}
+            account = {account}
+            onAccept = {acceptContract}
+            onReject = {rejectContract}
+          />
+        </Route>
+
+        <Route exact path={paths[0].appContractsOverview}>
+          <ContractsOverview 
+            contracts={contracts} 
+            statusValues={statusValues}
           />
         </Route>
 
