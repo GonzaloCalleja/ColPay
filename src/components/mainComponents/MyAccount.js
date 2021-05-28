@@ -82,7 +82,7 @@ const MyAccount = ({ contracts, balance, isBlocked, incurredDebt, potentialDebt,
                         <Grid item sm={false} md={1}/>
                         {
                             contracts.length > 0
-                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={[statusValues[0].Accepted ]} allStatusValues={statusValues}/></Grid>
+                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={[statusValues[0].Accepted ]} allStatusValues={statusValues} reviewTable={false}/></Grid>
                             : <Typography variant='h6'>No Active Contracts to Show</Typography>
                         }
                         <Grid item sm={false} md={1}/>

@@ -31,7 +31,7 @@ const ContractsOverview = ({contracts, statusValues}) => {
                         <Grid item sm={false} md={1}/>
                         {
                             contracts.length > 0
-                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={[statusValues[0].NotReviewed, statusValues[0].Rejected, statusValues[0].Accepted, statusValues[0].Fulfilled, statusValues[0].MissingPayments  ]} allStatusValues={statusValues}/></Grid>
+                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={[statusValues[0].NotReviewed, statusValues[0].Rejected, statusValues[0].Accepted, statusValues[0].Fulfilled, statusValues[0].MissingPayments  ]} reviewTable={false} allStatusValues={statusValues}/></Grid>
                             : <Typography variant='h6'>No Contracts to Show</Typography>
                         }
                         <Grid item sm={false} md={1}/>

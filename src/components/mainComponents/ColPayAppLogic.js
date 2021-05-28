@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }))
 
-const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, AccountsToName}) => {
+const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, AccountsToName, accountName}) => {
 
   const classes = useStyles()
 
@@ -107,6 +107,8 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
           const contractID = await colPay.methods.paymentContractsHeldPerAddress(account, id).call()
           const contract = await colPay.methods.paymentContracts(contractID).call()
 
+          contract.accountName = accountName
+
           contract.totalEther = Math.round(window.web3.utils.fromWei(contract.totalAmount.toString(), 'Ether') * 100)/100
           contract.paidEther = Math.round(window.web3.utils.fromWei(contract.amountPaid.toString(), 'Ether') *100)/100
 
@@ -140,16 +142,26 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
           contract.transactions = transactions
 
           let recipient, recipientName
-          if (contracts.seller === account){
+          if (contract.createdBySeller){
             recipient = contract.buyer
             recipientName = AccountsToName[0][contract.buyer]
           }else {
             recipient = contract.seller
             recipientName = AccountsToName[0][contract.seller] 
           }
-
           contract.recipient = recipient
           contract.recipientName = recipientName
+
+          let partner, partnerName
+          if (account == contract.seller){
+            partner = contract.buyer
+            partnerName = AccountsToName[0][contract.buyer]
+          }else {
+            partner = contract.seller
+            partnerName = AccountsToName[0][contract.seller] 
+          }
+          contract.partner = partner
+          contract.partnerName = partnerName
 
           contractsToUpdate.push(contract)
         }

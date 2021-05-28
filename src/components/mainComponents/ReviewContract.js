@@ -26,12 +26,12 @@ const ReviewContract = ({contracts, statusValues, account, onAccept, onReject}) 
     return (
         <div className={classes.root}>
             <Grid container direction='column' className={classes.mainGrid} spacing={2}>
-                <Title title={'Contracts Overview'}/>
+                <Title title={'Contracts Not yet Reviewed'}/>
                     <Grid item sm={12} md={12} container>
                         <Grid item sm={false} md={1}/>
                         {
                             contracts.length > 0
-                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={[statusValues[0].NotReviewed]} allStatusValues={statusValues}/></Grid>
+                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable onReject={onReject} onAccept={onAccept} account={account} contracts={contracts} statusValues={[statusValues[0].NotReviewed]} allStatusValues={statusValues} reviewTable={true}/></Grid>
                             : <Typography variant='h6'>No Contracts to Show</Typography>
                         }
                         <Grid item sm={false} md={1}/>

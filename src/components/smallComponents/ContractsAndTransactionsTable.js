@@ -9,6 +9,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
@@ -20,6 +21,13 @@ const useRowStyles = makeStyles({
       borderBottom: 'unset',
     },
   },
+  reject: {
+    backgroundColor: '#ff6961',
+    marginTop: 5,
+    '&:hover': {
+      background: '#993F3A',
+    },
+  }
 });
 
 const StyledTableCell = withStyles((theme) => ({
@@ -41,7 +49,7 @@ const StyledTableCell = withStyles((theme) => ({
   }))(TableRow);
 
 function Row(props) {
-  const { row, allStatusValues } = props;
+  const { row, allStatusValues, reviewTable, onAccept, onReject, account } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
 
@@ -63,12 +71,45 @@ function Row(props) {
         <StyledTableCell align="left">{row.name}</StyledTableCell>
         <StyledTableCell align="left">{row.totalEther} Eth</StyledTableCell>
         <StyledTableCell align="left">{row.paidEther} Eth</StyledTableCell>
-        <StyledTableCell align="left">{row.recipientName}</StyledTableCell>
+        <StyledTableCell align="left">{ row.partnerName}</StyledTableCell>
         <StyledTableCell align="left">{row.startDateFormat}</StyledTableCell>
         <StyledTableCell align="left">{row.expiryDateFormat}</StyledTableCell>
         <StyledTableCell align="center">{row.speed}</StyledTableCell>
         <StyledTableCell align="left">{row.statusName.toString()}</StyledTableCell>
         <StyledTableCell align="center">{row.daysToOpen}</StyledTableCell>
+        {(reviewTable && account === row.recipient)
+        ?
+          <StyledTableCell align="center">
+            <Button 
+              variant="contained" 
+              color="primary" 
+              size='small'
+              id = {row.id}
+              onClick={(event) => {
+                onAccept(event.target.id)
+              } }
+              >
+              Accept
+            </Button>
+            <Button 
+              className={classes.reject}
+              variant="contained" 
+              color="primary" 
+              id = {row.id}
+              size='small'
+              onClick={(event) => {
+                onReject(event.target.id)
+              } }
+              >
+              Reject
+            </Button>
+          </StyledTableCell>
+          : [
+            reviewTable
+            ? <StyledTableCell align="center"><Typography variant='overline' noWrap>To Review by:</Typography> <Typography variant='subtitle2' noWrap>{row.recipientName}</Typography></StyledTableCell>
+            : null
+          ]
+        }
         
       </StyledTableRow>
       {
@@ -125,7 +166,7 @@ function Row(props) {
   );
 }
 
-const ContractsAndTransactionsTable =({ contracts, statusValues, allStatusValues }) => {
+const ContractsAndTransactionsTable =({ contracts, statusValues, allStatusValues, reviewTable, onAccept, onReject, account }) => {
 
   return (
     <TableContainer component={Paper}>
@@ -137,19 +178,20 @@ const ContractsAndTransactionsTable =({ contracts, statusValues, allStatusValues
             <StyledTableCell align="left">NAME</StyledTableCell>
             <StyledTableCell align="left">TOTAL VALUE</StyledTableCell>
             <StyledTableCell align="left">PAID VALUE</StyledTableCell>
-            <StyledTableCell align="left">RECIPIENT</StyledTableCell>
+            <StyledTableCell align="left">PARTNER</StyledTableCell>
             <StyledTableCell align="left">START</StyledTableCell>
             <StyledTableCell align="left">EXPIRATION</StyledTableCell>
             <StyledTableCell align="center">SPEED</StyledTableCell>
             <StyledTableCell align="left">STATUS</StyledTableCell>
             <StyledTableCell align="left">DAYS LOCKED</StyledTableCell>
+            {reviewTable && <StyledTableCell align="center">ACTION</StyledTableCell>}
 
           </StyledTableRow>
         </TableHead>
         <TableBody>
           {contracts.map((contract) => {
             if( statusValues.includes(contract.statusName)){
-              return <Row key={contract.id.toString()} row={contract} allStatusValues={allStatusValues} />
+              return <Row key={contract.id.toString()} row={contract} allStatusValues={allStatusValues} reviewTable={reviewTable} onReject={onReject} onAccept={onAccept} account={account}/>
             }
             })}
         </TableBody>

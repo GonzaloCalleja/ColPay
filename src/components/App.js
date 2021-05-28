@@ -64,7 +64,7 @@ const App = () => {
                     { !Object.values(paths[0]).includes(window.location.pathname) && <Route render={()=>(<Redirect to={paths[0].home}/>)} /> }
                     <Switch>
                         <Route path={paths[0].home} exact component={LandingPage} /> 
-                        <Route path={paths[0].appMain} component={()=>{return(<ColPayAppLogic AccountsToName={AccountsToName} paths={paths} onLoadAccount={onLoadAccount} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>)}} />
+                        <Route path={paths[0].appMain} component={()=>{return(<ColPayAppLogic AccountsToName={AccountsToName} paths={paths} onLoadAccount={onLoadAccount} accountName={accountName} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>)}} />
                     </Switch>
                 </div>
                 <Footer paths={paths}/>
