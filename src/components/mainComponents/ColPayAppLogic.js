@@ -10,12 +10,12 @@ import CPToken from '../../abis/CPToken.json'
 import Web3 from 'web3'
 
 // Components
-import Main from '../Main.js'
-import Drawer from './Drawer.js'
-import MyAccount from './MyAccount.js'
-import ContractsOverview from './ContractsOverview.js'
-import ContractsReview from './ContractsReview.js'
-import ContractCreate from './ContractCreate.js'
+import Drawer from './Drawer'
+import MyAccount from './MyAccount'
+import ContractsOverview from './ContractsOverview'
+import ContractsReview from './ContractsReview'
+import ContractCreate from './ContractCreate'
+import RequestTransaction from './RequestTransaction'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -328,31 +328,20 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
               />
         </Route> 
 
-
-      {/* ADD ALL MENU COMPONENTS HEREE */}
-
-      <Route path={paths[0].appMore} exact component={()=>
-        {
-          if(loading){
-            return(<Typography>Loading...</Typography>)
-          }
-          else {
-            return(
-              <Main 
-              onCreateContract={createPaymentContract}
-              account={account}
-              contracts={contracts}
-              onAccept={acceptContract}
-              onReject={rejectContract}
-              balance={cpTokenBalance}
-              incurredDebt={incurredDebt}
-              potentialDebt={potentialDebt}
-              isBlocked={isBlocked}
+        <Route exact path={paths[0].appRequest} component={()=>{
+          if (loading){
+            return (<Typography variant='h2'>Loading...</Typography>)
+          }else {
+            return (
+              <RequestTransaction 
               onTransaction={makeTransaction}
-            />
+              contracts={contracts} 
+              statusValues={statusValues}
+              />
             )
           }
         }} /> 
+
       </Switch>
     </div>
   );

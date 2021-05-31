@@ -146,7 +146,7 @@ function Row(props) {
                           <StyledTableCell align="left">{transaction.successful ? <Typography variant='inherit' color='primary'>YES</Typography> : <Typography variant='inherit' color='error'>NO</Typography>}</StyledTableCell>
                           <StyledTableCell align="left">{transaction.valueEther} Eth</StyledTableCell>
                           <StyledTableCell align="left">
-                            {Math.round(transaction.valueEther * row.totalEther * 100) / 100} %
+                            {Math.round(transaction.valueEther / row.totalEther * 10000) / 100} %
                           </StyledTableCell>
                         </StyledTableRow>
                       ))}
