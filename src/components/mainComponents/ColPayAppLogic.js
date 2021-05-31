@@ -14,6 +14,7 @@ import Drawer from './Drawer'
 import MyAccount from './MyAccount'
 import ContractsOverview from './ContractsOverview'
 import ContractsReview from './ContractsReview'
+import TransactionsOverview from './TransactionsOverview'
 import ContractCreate from './ContractCreate'
 import RequestTransaction from './RequestTransaction'
 
@@ -325,6 +326,13 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
              <ContractsOverview
                 contracts={contracts} 
                 statusValues={statusValues}
+              />
+        </Route> 
+
+        <Route exact path={paths[0].appTransactions}>
+             <TransactionsOverview
+                contracts={contracts} 
+                account={account}
               />
         </Route> 
 

@@ -288,7 +288,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       button: true,
       state: recipientsSelected,
       onClick: () => {
-        history.push(paths[0].appTransactions)
+        history.push(paths[0].appRecipients)
         setAccountSelected(false)
         setCreateContractSelected(false)
         setReviewSelectedSelected(false)

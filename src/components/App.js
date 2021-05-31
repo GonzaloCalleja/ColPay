@@ -29,6 +29,7 @@ const App = () => {
         appRecurring: '/app/recurring-transaction',
         appTransactions: '/app/all-transactions',
         appContractsOverview: '/app/all-conracts',
+        appRecipients: '/app/view-recipients',
         appMore: '/app/more'
         }
     )
