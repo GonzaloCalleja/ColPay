@@ -72,11 +72,11 @@ const RecipientsOverview = ({contracts, statusValues}) => {
     return (
         <div className={classes.root}>
             <Grid container direction='column' className={classes.mainGrid} spacing={2}>
-                <Title title={'Recipients'}/>
+                <Title title={'Partners'}/>
                 <Grid item sm={12} md={12} container>
                     <Grid item sm={false} md={1}/>
                     <Grid item sm={10}>
-                        <Typography variant='body1' gutterBottom>You can filter Recipients by the Status of the Contracs you have with them:</Typography>
+                        <Typography variant='body1' gutterBottom>You can filter your Partners by the Status of the Contracs you have with them:</Typography>
                     <FormGroup row>
                     <FormControlLabel
                             control={

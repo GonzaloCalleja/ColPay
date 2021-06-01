@@ -281,7 +281,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       }
     },
     {
-      text: 'Recipients',
+      text: 'Partners',
       className: classes.drawerText,
       icon: null,
       spacing: null,
