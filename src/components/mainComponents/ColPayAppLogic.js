@@ -15,6 +15,7 @@ import MyAccount from './MyAccount'
 import ContractsOverview from './ContractsOverview'
 import ContractsReview from './ContractsReview'
 import TransactionsOverview from './TransactionsOverview'
+import RecipientsOverview from './RecipientsOverview'
 import ContractCreate from './ContractCreate'
 import RequestTransaction from './RequestTransaction'
 
@@ -333,6 +334,13 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
              <TransactionsOverview
                 contracts={contracts} 
                 account={account}
+              />
+        </Route> 
+
+        <Route exact path={paths[0].appRecipients}>
+             <RecipientsOverview
+                contracts={contracts} 
+                statusValues={statusEnumValues}
               />
         </Route> 
 

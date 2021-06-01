@@ -50,8 +50,6 @@ export default function TransactionsTable({contracts, account}) {
       }
   }
 
-  console.log(transactions)
-
   return (
     <TableContainer component={Paper}>
       <Table className={classes.table} aria-label="customized table">

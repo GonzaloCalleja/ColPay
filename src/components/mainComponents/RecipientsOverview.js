@@ -1,9 +1,9 @@
-import { Grid, Typography, FormGroup, FormControlLabel, Checkbox } from '@material-ui/core'
+import { Grid, FormGroup, FormControl, Checkbox, FormControlLabel, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useState } from 'react'
 
 import Title from '../smallComponents/Title'
-import ContractsAndTransactionsTable from '../smallComponents/ContractsAndTransactionsTable'
+import RecipientCard from '../smallComponents/RecipientCard'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -19,11 +19,9 @@ const useStyles = makeStyles((theme) => ({
     }
   }))
 
-const ContractsOverview = ({contracts, statusValues}) => {
+const RecipientsOverview = ({contracts, statusValues}) => {
 
     const classes = useStyles()
-
-    const [selectedStatus, setSelectedStatus] = useState([statusValues[0].NotReviewed, statusValues[0].Rejected, statusValues[0].Accepted, statusValues[0].Fulfilled, statusValues[0].MissingPayments])
 
     const [state, setState] = useState({
         Accepted: true,
@@ -34,34 +32,51 @@ const ContractsOverview = ({contracts, statusValues}) => {
       });
     
       const handleChange = (event) => {
-        setState({ ...state, [event.target.name]: event.target.checked })
-
-        let statuses = selectedStatus
-
-        let name = event.target.name
-        if (name === 'NotReviewed') name = statusValues[0].NotReviewed
-        if (name === 'MissingPayments') name = statusValues[0].MissingPayments
-
-        if (event.target.checked){
-            statuses.push(name)
-        }else{
-            statuses.splice(statuses.indexOf(name), 1)
-        }
-
-        setSelectedStatus(statuses)
-
-        console.log(selectedStatus)
-
+        setState({ ...state, [event.target.name]: event.target.checked });
       };
+
+    let recipients = []
+    let recipientNumber = 0
+
+    for (let i=0; i < contracts.length; i++){
+
+        let status = statusValues[contracts[i].status]
+
+        if(state[status]){
+
+            let recipientIncludedId = -1
+
+            for (let j=0; j < recipientNumber; j++){
+                if (recipients[j].id === contracts[i].partner){
+                    recipientIncludedId = j
+                }
+            }
+
+            if(recipientIncludedId == -1){
+                let recipient = {
+                    name: contracts[i].partnerName,
+                    id: contracts[i].partner,
+                    contracts: 1,
+                    value: contracts[i].totalEther
+                }
+                recipients[recipientNumber] = recipient
+                recipientNumber++
+            }
+            else {
+                recipients[recipientIncludedId].contracts ++
+                recipients[recipientIncludedId].value += contracts[i].totalEther
+            }
+        }
+    }
 
     return (
         <div className={classes.root}>
             <Grid container direction='column' className={classes.mainGrid} spacing={2}>
-                <Title title={'Contracts Overview'}/>
+                <Title title={'Recipients'}/>
                 <Grid item sm={12} md={12} container>
                     <Grid item sm={false} md={1}/>
                     <Grid item sm={10}>
-                        <Typography variant='body1' gutterBottom>You can filter Contracts by Status:</Typography>
+                        <Typography variant='body1' gutterBottom>You can filter Recipients by the Status of the Contracs you have with them:</Typography>
                     <FormGroup row>
                     <FormControlLabel
                             control={
@@ -121,18 +136,21 @@ const ContractsOverview = ({contracts, statusValues}) => {
                         </FormGroup>
                     </Grid>
                 </Grid>
-                    <Grid item sm={12} md={12} container>
-                        <Grid item sm={false} md={1}/>
-                        {
-                            contracts.length > 0
-                            ? <Grid item sm={10} md={10}><ContractsAndTransactionsTable contracts={contracts} statusValues={selectedStatus} reviewTable={false} allStatusValues={statusValues}/></Grid>
-                            : <Typography variant='h6'>No Contracts to Show</Typography>
-                        }
-                        <Grid item sm={false} md={1}/>
+                <Grid item sm={12} md={12} container>
+                    <Grid item sm={false} md={1}/>
+                    <Grid item sm={12} md={10} container spacing={3}>
+                            {
+                            recipients.map((recipient, key) => (
+                                <Grid item sm={12} lg={6}><RecipientCard recipient={recipient}/></Grid>
+                            ))
+                            }
                     </Grid>
+                    <Grid item sm={false} md={1}/>
                 </Grid>
+
+            </Grid>
         </div>
     )
 }
 
-export default ContractsOverview
+export default RecipientsOverview
