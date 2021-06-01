@@ -371,6 +371,7 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
         }} /> 
 
       </Switch>
+      
     </div>
   );
 }

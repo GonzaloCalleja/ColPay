@@ -111,6 +111,11 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
     }
   };
 
+  const handleLandingChange = (event, newSelectedTab) => {
+
+    setSelectedTab(newSelectedTab)
+  };
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -142,7 +147,7 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
         <Typography variant='caption'>ColPay ID</Typography>
         <Typography variant='overline'>{account}</Typography>
         </MenuItem>
-      <MenuItem component={RouterLink} to= {paths[0].appMyProfile} onClick={handleMenuClose}>My Profile</MenuItem>
+      {/*<MenuItem component={RouterLink} to= {paths[0].appMyProfile} onClick={handleMenuClose}>My Profile</MenuItem>*/}
       <MenuItem component={RouterLink} to= {paths[0].home} onClick={handleLogOut}>Logout</MenuItem>
     </Menu>
   );
@@ -168,7 +173,7 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
             {showLandingPage
             ?
               <div className={classes.sectionDesktop}>
-                <Tabs value={selectedTab} onChange={handleChange}>
+                <Tabs value={selectedTab} onChange={handleLandingChange}>
                   <Tab label='Home' className={classes.hide} component={ScrollLink} to="home" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                   <Tab label='About' className={classes.tabs} component={ScrollLink} to="about" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                   <Tab label='Services' className={classes.tabs} component={ScrollLink} to="services" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
