@@ -18,6 +18,7 @@ import TransactionsOverview from './TransactionsOverview'
 import RecipientsOverview from './RecipientsOverview'
 import ContractCreate from './ContractCreate'
 import RequestTransaction from './RequestTransaction'
+import RecurringTransactions from './RecurringTransactions'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -341,6 +342,11 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
              <RecipientsOverview
                 contracts={contracts} 
                 statusValues={statusEnumValues}
+              />
+        </Route> 
+
+        <Route exact path={paths[0].appRecurring}>
+             <RecurringTransactions
               />
         </Route> 
 

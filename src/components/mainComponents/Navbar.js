@@ -95,7 +95,12 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
   const isMenuOpen = Boolean(anchorEl)
 
   const handleChange = (event, newSelectedTab) => {
-    setSelectedTab(newSelectedTab)
+    if(selectedTab !== newSelectedTab){
+      setSelectedTab(newSelectedTab)
+    }
+    else{
+      setSelectedTab(0)
+    }
   };
 
   const handleProfileMenuOpen = (event) => {
@@ -172,6 +177,7 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
               </div>
             :
               <div className={classes.sectionDesktop}>
+                {
                 <Tabs value={selectedTab} onChange={handleChange}>
                 <Tab label='Home' className={classes.hide} component={ScrollLink} to="home" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                   <Tab label='Help & Support' className={classes.tabs} component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
@@ -181,6 +187,7 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
                     labelContainer: classes.labelContainer
                   }}/>
                 </Tabs>
+                }
                 <div className={classNames(classes.grow, classes.sectionDesktop)}>
                   <Button
                     className={classNames(classes.navLink, classes.button)}

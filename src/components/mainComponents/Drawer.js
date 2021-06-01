@@ -167,6 +167,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
       spacing: <div className={classes.spacing} />,
       button: false,
     },
+    /*
     {
       text: 'Upload an Invoice',
       className: classes.drawerText,
@@ -188,6 +189,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setMoreSelected(false)
       }
     },
+    */
     {
       text: 'Request a Payment',
       className: classes.drawerText,
