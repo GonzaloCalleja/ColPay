@@ -29,6 +29,7 @@
         "react-router-dom": "^5.2.0",
         "react-scripts": "4.0.3",
         "react-scroll": "^1.8.2",
+        "recharts": "^2.0.9",
         "truffle": "5.1.39",
         "web-vitals": "^1.1.2",
         "web3": "1.2.11",

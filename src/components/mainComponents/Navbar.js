@@ -1,6 +1,6 @@
 import React from "react"
 import { useState, useEffect } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useHistory } from 'react-router-dom'
 import { Link as ScrollLink} from "react-scroll";
 import { AppBar, Toolbar, MenuItem, Menu, Link, Button, Tabs, Tab, Collapse, Typography, IconButton } from "@material-ui/core"
 import { makeStyles } from '@material-ui/core/styles'
@@ -68,6 +68,7 @@ const useStyles = makeStyles((theme) => ({
 const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
 
   const classes = useStyles()
+  let history = useHistory();
 
   const [anchorEl, setAnchorEl] = useState(null)
 
@@ -95,11 +96,18 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
   const isMenuOpen = Boolean(anchorEl)
 
   const handleChange = (event, newSelectedTab) => {
-    if(selectedTab !== newSelectedTab){
-      setSelectedTab(newSelectedTab)
-    }
-    else{
+
+    if(selectedTab === newSelectedTab){
       setSelectedTab(0)
+      history.push(paths[0].appMyAccount)
+    }
+    else if (newSelectedTab === 1){
+      setSelectedTab(newSelectedTab)
+      history.push(paths[0].appHelp)
+    }
+    else if (newSelectedTab === 2){
+      setSelectedTab(newSelectedTab)
+      history.push(paths[0].appTrends)
     }
   };
 
@@ -179,9 +187,9 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
               <div className={classes.sectionDesktop}>
                 {
                 <Tabs value={selectedTab} onChange={handleChange}>
-                <Tab label='Home' className={classes.hide} component={ScrollLink} to="home" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='Help & Support' className={classes.tabs} component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='Trends' className={classes.tabs} component={ScrollLink} to="" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}} 
+                <Tab label='Home' className={classes.hide} component={RouterLink} to={paths[0].appReviewContract} activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Help & Support' className={classes.tabs} activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Trends' className={classes.tabs} activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}} 
                   classes={{
                     wrapper: classes.iconLabelWrapper,
                     labelContainer: classes.labelContainer

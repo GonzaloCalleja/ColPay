@@ -30,7 +30,9 @@ const App = () => {
         appTransactions: '/app/all-transactions',
         appContractsOverview: '/app/all-conracts',
         appRecipients: '/app/view-recipients',
-        appMore: '/app/more'
+        appMore: '/app/more',
+        appTrends: '/app/Trends',
+        appHelp: '/app/Help'
         }
     )
     // This information would live in ColPays backend and be secured in normal application.
