@@ -37,7 +37,7 @@ const Help = () => {
                                     <TextField
                                         required
                                         variant="outlined"
-                                        id="lastName"
+                                        id="Name"
                                         name="lastName"
                                         label="Name"
                                         fullWidth
@@ -47,7 +47,7 @@ const Help = () => {
                                 <TextField
                                         required
                                         variant="outlined"
-                                        id="lastName"
+                                        id="email"
                                         name="lastName"
                                         label="Email"
                                         fullWidth
@@ -57,7 +57,7 @@ const Help = () => {
                                 <TextField
                                         required
                                         variant="outlined"
-                                        id="lastName"
+                                        id="message"
                                         name="lastName"
                                         label="Subject"
                                         fullWidth

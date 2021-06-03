@@ -42,7 +42,7 @@ const ContractRecipientForm = ({handleChange, AccountsToName, contractArguments,
                         Object.entries(AccountsToName[0]).map(([address, name], key) => {
                             if (account !== address ){
                                 return (<MenuItem key={key} value={address}>{name}</MenuItem>)
-                            }
+                            } else return null
                         })
                     }
                     </Select>

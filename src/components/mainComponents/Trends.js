@@ -1,4 +1,4 @@
-import { Grid, Typography, Paper } from '@material-ui/core'
+import { Grid, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 import Title from '../smallComponents/Title'

@@ -1,6 +1,6 @@
-import { Grid, Typography, Divider } from '@material-ui/core'
+import { Grid, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Link as RouterLink, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 
 import Title from '../smallComponents/Title'
 import SingleFieldCard from '../smallComponents/SingleFieldCard'

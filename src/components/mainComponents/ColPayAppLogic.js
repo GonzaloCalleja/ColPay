@@ -1,6 +1,6 @@
 // Library Elements
 import { useEffect, useState } from 'react'
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import { Typography, LinearProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
@@ -23,7 +23,7 @@ import Trends from './Trends'
 import AppHelp from './AppHelp'
 
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     display: 'flex',
   },
@@ -159,7 +159,7 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
           contract.recipientName = recipientName
 
           let partner, partnerName
-          if (account == contract.seller){
+          if (account === contract.seller){
             partner = contract.buyer
             partnerName = AccountsToName[0][contract.buyer]
           }else {

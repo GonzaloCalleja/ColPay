@@ -84,7 +84,7 @@ const RequestTransaction = ({onTransaction, contracts, statusValues }) => {
                                                 contracts.map((contract, key) => {
                                                     if(statusValues[0].Accepted === contract.statusName || statusValues.MissingPayments === contract.statusName){
                                                         return <MenuItem key={key} value={contract.id}>{contract.name}</MenuItem>
-                                                    }
+                                                    } else return null
                                                 }
                                                 )
                                                 }

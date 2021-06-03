@@ -74,7 +74,7 @@ const App = () => {
                 <div>
                     { !Object.values(paths[0]).includes(window.location.pathname) && <Route render={()=>(<Redirect to={paths[0].home}/>)} /> }
                     <Switch>
-                        <Route path={paths[0].home} exact component={LandingPage} /> 
+                        <Route path={paths[0].home} exact component={()=>{return(<LandingPage setLoggedIn={setLoggedIn} />)}} /> 
                         <Route path={paths[0].appLogIn} exact component={()=>{return(<SignIn setLoggedIn = {setLoggedIn} paths={paths}/>)}} /> 
                         <Route path={paths[0].appSignUp} exact component={()=>{return(<SignUp setLoggedIn = {setLoggedIn} paths={paths}/>)}} />
                         <Route path={paths[0].appMain} component={()=>{return(<ColPayAppLogic setLoggedIn = {setLoggedIn} AccountsToName={AccountsToName} paths={paths} onLoadAccount={onLoadAccount} accountName={accountName} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>)}} />

@@ -1,15 +1,8 @@
-import { Typography, Paper, Grid, Container, Avatar, TextField, Button, IconButton } from '@material-ui/core'
+import { Typography, Paper, Grid, Container, Avatar} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 import LandingStepper from '../smallComponents/LandingStepper'
 import Help from '../smallComponents/Help'
-import HeadsetIcon from '@material-ui/icons/Headset';
-import MailOutlineIcon from '@material-ui/icons/MailOutline';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
-import InstagramIcon from '@material-ui/icons/Instagram';
-import FacebookIcon from '@material-ui/icons/Facebook';
-import TwitterIcon from '@material-ui/icons/Twitter';
-import LinkedInIcon from '@material-ui/icons/LinkedIn';
 
 import backgroundTitle from '../../resources/Frame1.png'
 import lockIcon from '../../resources/lock.png'
@@ -78,9 +71,11 @@ const useStyles = makeStyles((theme) => ({
 
 }));
 
-const LandingPage = () => {
+const LandingPage = ({setLoggedIn}) => {
 
     const classes = useStyles()
+
+    setLoggedIn(false)
 
     return (
         <Grid container direction='column'>

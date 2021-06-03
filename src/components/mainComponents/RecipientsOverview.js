@@ -1,4 +1,4 @@
-import { Grid, FormGroup, FormControl, Checkbox, FormControlLabel, Typography } from '@material-ui/core'
+import { Grid, FormGroup, Checkbox, FormControlLabel, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useState } from 'react'
 
@@ -52,7 +52,7 @@ const RecipientsOverview = ({contracts, statusValues}) => {
                 }
             }
 
-            if(recipientIncludedId == -1){
+            if(recipientIncludedId === -1){
                 let recipient = {
                     name: contracts[i].partnerName,
                     id: contracts[i].partner,

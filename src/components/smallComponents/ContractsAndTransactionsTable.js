@@ -194,7 +194,7 @@ const ContractsAndTransactionsTable =({ contracts, statusValues, allStatusValues
           {contracts.map((contract) => {
             if( statusValues.includes(contract.statusName)){
               return <Row key={contract.id.toString()} row={contract} allStatusValues={allStatusValues} reviewTable={reviewTable} onReject={onReject} onAccept={onAccept} account={account}/>
-            }
+            } else return null
             })}
         </TableBody>
       </Table>

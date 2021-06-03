@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link as RouterLink, useHistory } from 'react-router-dom'
+import { useHistory } from 'react-router-dom'
 import {
   Drawer as MUIDrawer,
   ListItem,
@@ -12,7 +12,6 @@ import { makeStyles, useTheme } from "@material-ui/core/styles"
 import SyncAltOutlinedIcon from '@material-ui/icons/SyncAltOutlined'
 import DescriptionOutlinedIcon from '@material-ui/icons/DescriptionOutlined'
 import AccountCircleOutlinedIcon from '@material-ui/icons/AccountCircleOutlined'
-import MoreHorizOutlinedIcon from '@material-ui/icons/MoreHorizOutlined'
 
 const useStyles = makeStyles((theme) => ({
   root: {

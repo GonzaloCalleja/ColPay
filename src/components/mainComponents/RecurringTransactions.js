@@ -38,7 +38,7 @@ const RecurringTransaction = () => {
 
     const classes = useStyles()
 
-    const steps = [
+    const recurringSteps = [
         {
             icon: <Avatar alt="Details" variant='square' className={classes.large} src="https://image.flaticon.com/icons/png/512/1484/1484924.png" />,
             title: '1. Details',
@@ -75,7 +75,7 @@ const RecurringTransaction = () => {
                             <Grid item sm={12} container spacing={4}>
                             
                                 {
-                                    steps.map((step, key) =>(
+                                    recurringSteps.map((step, key) =>(
                                         <Grid key={key} item sm={3}>
                                             <div className={classes.stepper}>
                                                 {step.icon}
