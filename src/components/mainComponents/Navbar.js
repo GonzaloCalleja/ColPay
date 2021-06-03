@@ -65,7 +65,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
+const Navbar = ({account, accountName, handleDrawerToggle, paths, loggedIn, setLoggedIn}) => {
 
   const classes = useStyles()
   let history = useHistory();
@@ -127,6 +127,7 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
   const handleLogOut = () => {
     handleMenuClose();
     setShowLandingPage(!showLandingPage)
+    setLoggedIn(false)
   };
 
   const menuId = 'primary-search-account-menu';
@@ -180,10 +181,10 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
                   <Tab label='Contact' className={classes.tabs} component={ScrollLink} to="contact" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                 </Tabs>
                 <div className={classNames(classes.grow, classes.sectionDesktop)}>
-                  <Button component={RouterLink} to={paths[0].appMain}  size='large' color="inherit" variant="outlined" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
+                  <Button component={RouterLink} to={paths[0].appLogIn}  size='large' color="inherit" variant="outlined" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
                     Log In
                   </Button>
-                  <Button component={RouterLink} to={paths[0].appMain}  size='large' color="secondary" variant="contained" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
+                  <Button component={RouterLink} to={paths[0].appSignUp}  size='large' color="secondary" variant="contained" className={classes.navLink} onClick={()=>{setShowLandingPage(!showLandingPage)}}>
                     Sign Up
                   </Button>
                 </div>
@@ -201,6 +202,8 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
                   }}/>
                 </Tabs>
                 }
+                {
+                  loggedIn &&
                 <div className={classNames(classes.grow, classes.sectionDesktop)}>
                   <Button
                     className={classNames(classes.navLink, classes.button)}
@@ -217,6 +220,7 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
                     {accountName}
                   </Button>
                 </div>
+                }
               </div>
             }
           </div>

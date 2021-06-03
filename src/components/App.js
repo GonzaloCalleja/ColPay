@@ -9,6 +9,8 @@ import ColPayAppLogic from './mainComponents/ColPayAppLogic.js'
 import Navbar from './mainComponents/Navbar.js'
 import Footer from './mainComponents/Footer.js'
 import ScrollToTop from './smallComponents/ScrollToTop.js'
+import SignIn from './smallComponents/SignIn.js'
+import SignUp from './smallComponents/SignUp.js'
 
 const App = () => {
 
@@ -20,6 +22,8 @@ const App = () => {
         {
         home: '/',
         appMain: '/app',
+        appLogIn: '/LogIn',
+        appSignUp: '/SignUp',
         appMyAccount: '/app/my-account',
         appMyProfile: '/app/my-profile',
         appCreateContract: '/app/create-contract',
@@ -52,7 +56,9 @@ const App = () => {
     const onLoadAccount = async (newAccount)=>{
         setAccount(newAccount)
         setAccountName(AccountsToName[0][newAccount])
-    }    
+    }   
+    
+    const [loggedIn, setLoggedIn] = useState(false)
 
     const [mobileOpen, setMobileOpen] = useState(false)
     const handleDrawerToggle = () => {
@@ -64,12 +70,14 @@ const App = () => {
             <CssBaseline />
             <Router>
                 <ScrollToTop />
-                <Navbar account={account} accountName={accountName} handleDrawerToggle={handleDrawerToggle} paths={paths}/>
+                <Navbar account={account} accountName={accountName} handleDrawerToggle={handleDrawerToggle} paths={paths} setLoggedIn={setLoggedIn} loggedIn={loggedIn}/>
                 <div>
                     { !Object.values(paths[0]).includes(window.location.pathname) && <Route render={()=>(<Redirect to={paths[0].home}/>)} /> }
                     <Switch>
                         <Route path={paths[0].home} exact component={LandingPage} /> 
-                        <Route path={paths[0].appMain} component={()=>{return(<ColPayAppLogic AccountsToName={AccountsToName} paths={paths} onLoadAccount={onLoadAccount} accountName={accountName} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>)}} />
+                        <Route path={paths[0].appLogIn} exact component={()=>{return(<SignIn setLoggedIn = {setLoggedIn} paths={paths}/>)}} /> 
+                        <Route path={paths[0].appSignUp} exact component={()=>{return(<SignUp setLoggedIn = {setLoggedIn} paths={paths}/>)}} />
+                        <Route path={paths[0].appMain} component={()=>{return(<ColPayAppLogic setLoggedIn = {setLoggedIn} AccountsToName={AccountsToName} paths={paths} onLoadAccount={onLoadAccount} accountName={accountName} mobileOpen={mobileOpen} handleDrawerToggle={handleDrawerToggle}/>)}} />
                     </Switch>
                 </div>
                 <Footer paths={paths}/>
