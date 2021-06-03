@@ -176,7 +176,7 @@ const Navbar = ({account, accountName, handleDrawerToggle, paths}) => {
                 <Tabs value={selectedTab} onChange={handleLandingChange}>
                   <Tab label='Home' className={classes.hide} component={ScrollLink} to="home" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                   <Tab label='About' className={classes.tabs} component={ScrollLink} to="about" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
-                  <Tab label='Services' className={classes.tabs} component={ScrollLink} to="services" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
+                  <Tab label='Service' className={classes.tabs} component={ScrollLink} to="services" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                   <Tab label='Contact' className={classes.tabs} component={ScrollLink} to="contact" activeClass="active" spy={true} smooth={true} offset={-100} duration={500} style={{ color: 'inherit', textDecoration: 'inherit'}}/>
                 </Tabs>
                 <div className={classNames(classes.grow, classes.sectionDesktop)}>

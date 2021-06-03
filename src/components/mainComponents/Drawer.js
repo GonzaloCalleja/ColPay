@@ -303,6 +303,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setMoreSelected(false)
       }
     },
+    /*
     {
       text: 'MORE',
       className: classes.drawerTitle,
@@ -331,6 +332,7 @@ const Drawer = ({ window, mobileOpen, handleDrawerToggle, paths }) => {
         setMoreSelected(true)
       }
     },
+    */
   ]
 
   const ListItems = (

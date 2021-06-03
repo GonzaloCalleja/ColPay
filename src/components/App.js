@@ -46,7 +46,7 @@ const App = () => {
         '0xaCFB095BC6AC0F2B258bA4E11D3b61Bb71D85dB2': 'Claire Du Bois',
         '0x72396Ab101470cfe264E11c4E2c4fF381A60Eb1e': 'Jean Doe',
         '0x8339f82b9bcC39FDF85901daCABD395F20688DB0': 'Chris Collins',
-        '0xFd7acFdb450b6c15D0bA5Aa8599518aF6400239C': 'Duarte Gross'
+        '0xFd7acFdb450b6c15D0bA5Aa8599518aF6400239C': 'Duarte Jameson'
     })
 
     const onLoadAccount = async (newAccount)=>{

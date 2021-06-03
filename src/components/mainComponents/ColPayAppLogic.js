@@ -1,7 +1,7 @@
 // Library Elements
 import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom'
-import { Typography, Grid } from '@material-ui/core'
+import { Typography, LinearProgress } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 // Smart Contract
@@ -20,6 +20,7 @@ import ContractCreate from './ContractCreate'
 import RequestTransaction from './RequestTransaction'
 import RecurringTransactions from './RecurringTransactions'
 import Trends from './Trends'
+import AppHelp from './AppHelp'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -295,7 +296,11 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
 
         <Route exact path={paths[0].appReviewContract} component={()=>{
           if (loading){
-            return (<Typography variant='h2'>Loading...</Typography>)
+            return (
+              <div style={{flexGrow: 1}}>
+              <Typography style={{paddingTop: '30px', paddingLeft: '30px'}}  variant='h2' gutterBottom>Loading...</Typography>
+              <LinearProgress style={{marginBottom: '100px'}}color="primary" />
+              </div>)
           }else {
             return (
               <ContractsReview 
@@ -312,7 +317,11 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
 
         <Route exact path={paths[0].appCreateContract} component={()=>{
           if (loading){
-            return (<Typography variant='h2'>Loading...</Typography>)
+            return (
+              <div style={{flexGrow: 1}}>
+              <Typography style={{paddingTop: '30px', paddingLeft: '30px'}}  variant='h2' gutterBottom>Loading...</Typography>
+              <LinearProgress style={{marginBottom: '100px'}}color="primary" />
+              </div>)
           }else {
             return (
               <ContractCreate 
@@ -351,6 +360,11 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
               />
         </Route> 
 
+        <Route exact path={paths[0].appHelp}>
+             <AppHelp
+              />
+        </Route> 
+
         <Route exact path={paths[0].appTrends}>
              <Trends
               />
@@ -358,7 +372,11 @@ const ColPayAppLogic = ({paths, onLoadAccount, mobileOpen, handleDrawerToggle, A
 
         <Route exact path={paths[0].appRequest} component={()=>{
           if (loading){
-            return (<Typography variant='h2'>Loading...</Typography>)
+            return (
+              <div style={{flexGrow: 1}}>
+              <Typography style={{paddingTop: '30px', paddingLeft: '30px'}}  variant='h2' gutterBottom>Loading...</Typography>
+              <LinearProgress style={{marginBottom: '100px'}}color="primary" />
+              </div>)
           }else {
             return (
               <RequestTransaction 
