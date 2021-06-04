@@ -97,7 +97,7 @@ export default function SignIn({paths, setLoggedIn}) {
             to={paths[0].appMain}
             onClick={()=>setLoggedIn(true)}
           >
-            Sign In
+            Log In
           </Button>
           <Grid container>
             <Grid item xs>
