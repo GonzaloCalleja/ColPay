@@ -58,7 +58,7 @@ export default function SignIn({paths, setLoggedIn}) {
           <LockOutlinedIcon color='primary'/>
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Log in
         </Typography>
         <form className={classes.form} noValidate>
           <TextField

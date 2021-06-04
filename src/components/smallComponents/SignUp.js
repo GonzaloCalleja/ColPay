@@ -130,7 +130,7 @@ export default function SignUp({paths, setLoggedIn}) {
           <Grid container justify="flex-end">
             <Grid item>
               <Typography component={RouterLink} to={paths[0].appLogIn}  variant="body2" color='primary'>
-                Already have an account? Sign in
+                Already have an account? Log in
               </Typography>
             </Grid>
           </Grid>
